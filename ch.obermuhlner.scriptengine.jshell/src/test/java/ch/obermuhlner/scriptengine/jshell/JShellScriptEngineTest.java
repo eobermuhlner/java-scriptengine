@@ -7,7 +7,7 @@ import javax.script.*;
 
 import static org.junit.Assert.*;
 
-public class JShellTest {
+public class JShellScriptEngineTest {
     @Test
     public void testEmpty() throws ScriptException {
         assertScript("", null);
