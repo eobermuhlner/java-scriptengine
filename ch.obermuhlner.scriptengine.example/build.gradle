@@ -7,7 +7,8 @@ repositories {
 }
 
 dependencies {
-    compile 'ch.obermuhlner:scriptengine-jshell:0.1'
+    compile project(':ch.obermuhlner.scriptengine.jshell')
+    //compile 'ch.obermuhlner:scriptengine-jshell:0.1'
 
     testCompile 'junit:junit:4.12'
 }
