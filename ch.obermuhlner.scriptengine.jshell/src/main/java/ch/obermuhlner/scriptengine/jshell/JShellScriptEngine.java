@@ -8,9 +8,12 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.Reader;
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class JShellScriptEngine implements ScriptEngine {
+
     private ScriptContext context = new SimpleScriptContext();
+
     private final JShell jshell = JShell.builder()
             .executionEngine(new LocalExecutionControlProvider(), null)
             .build();
@@ -82,14 +85,16 @@ public class JShellScriptEngine implements ScriptEngine {
 
     @Override
     public Object eval(String script, Bindings bindings) throws ScriptException {
-        Bindings globalBindings = context.getBindings(ScriptContext.GLOBAL_SCOPE);
-        pushVariables(globalBindings, bindings);
+        synchronized (jshell) {
+            Bindings globalBindings = context.getBindings(ScriptContext.GLOBAL_SCOPE);
+            pushVariables(globalBindings, bindings);
 
-        Object result = evaluateScript(script);
+            Object result = evaluateScript(script);
 
-        pullVariables(globalBindings, bindings);
+            pullVariables(globalBindings, bindings);
 
-        return result;
+            return result;
+        }
     }
 
     private static Map<String, Object> staticVariables;
@@ -116,7 +121,6 @@ public class JShellScriptEngine implements ScriptEngine {
         } catch (ScriptRuntimeException e) {
             throw (ScriptException) e.getCause();
         }
-
 
         for (String name : remainingKeys) {
             Object value = getVariableValue(name);
@@ -187,18 +191,33 @@ public class JShellScriptEngine implements ScriptEngine {
 
             for (SnippetEvent event : events) {
                 if (event.exception() != null) {
-                    throw new ScriptException(event.exception());
+                    JShellException exception = event.exception();
+                    String message = exception.getMessage() == null ? "" : ": " + exception.getMessage();
+                    if (exception instanceof EvalException) {
+                        EvalException evalException = (EvalException) exception;
+                        throw new ScriptException(evalException.getExceptionClassName() + message + "\n" + event.snippet().source());
+                    }
+                    throw new ScriptException(message + "\n" + event.snippet().source());
                 }
 
                 if (event.status() == Snippet.Status.VALID) {
-                    result = event.value(); // TODO convert value
+                    result = event.value();
                 } else {
-                    Optional<Diag> optionalDiag = jshell.diagnostics(event.snippet())
-                            .findAny();
+                    Snippet snippet = event.snippet();
+                    Optional<Diag> optionalDiag = jshell.diagnostics(snippet).findAny();
                     if (optionalDiag.isPresent()) {
                         Diag diag = optionalDiag.get();
                         throw new ScriptException(diag.getMessage(null) + "\n" + completionInfo.source());
                     }
+
+                    if (snippet instanceof DeclarationSnippet) {
+                        DeclarationSnippet declarationSnippet = (DeclarationSnippet) snippet;
+                        List<String> unresolvedDependencies = jshell.unresolvedDependencies(declarationSnippet).collect(Collectors.toList());
+                        if (!unresolvedDependencies.isEmpty()) {
+                            throw new ScriptException("Unresolved dependencies: " + unresolvedDependencies + "\n" + completionInfo.source());
+                        }
+                    }
+
                     throw new ScriptException("Unknown error\n" + completionInfo.source());
                 }
             }
