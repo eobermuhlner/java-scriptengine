@@ -1,14 +1,14 @@
 [![Build Status](https://travis-ci.org/eobermuhlner/java-scriptengine.svg?branch=master)](https://travis-ci.org/eobermuhlner/java-scriptengine)
 [![Code Coverage](https://img.shields.io/codecov/c/github/eobermuhlner/java-scriptengine.svg)](https://codecov.io/gh/eobermuhlner/java-scriptengine)
 [![Dependencies](https://img.shields.io/librariesio/github/eobermuhlner/java-scriptengine.svg)](https://github.com/eobermuhlner/java-scriptengine/pulse)
-[![Maven Central](https://img.shields.io/maven-central/v/ch.obermuhlner/java-scriptengine.svg)](https://search.maven.org/artifact/ch.obermuhlner/java-scriptengine)
+
 
 # java-scriptengine
 
 A collection of JSR-223 compatible script engines for Java.
 
 Currently supported script engines are:
-* JShell
+* JShell [![Maven Central - scriptengine-jshell](https://img.shields.io/maven-central/v/ch.obermuhlner/scriptengine-jshell.svg)](https://search.maven.org/artifact/ch.obermuhlner/scriptengine-jshell)
 
 
 ## JShell scripting engine
