@@ -1,0 +1,4 @@
+
+include 'ch.obermuhlner.scriptengine.jshell'
+include 'ch.obermuhlner.scriptengine.example'
+

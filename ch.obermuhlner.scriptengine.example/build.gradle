@@ -1,0 +1,14 @@
+apply plugin: 'java'
+apply plugin: 'eclipse'
+
+repositories {
+    mavenLocal()
+    mavenCentral()
+}
+
+dependencies {
+    compile project(':ch.obermuhlner.scriptengine.jshell')
+
+    testCompile 'junit:junit:4.12'
+}
+
