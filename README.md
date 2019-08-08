@@ -9,11 +9,11 @@ Currently supported script engines are:
 * JShell [![Maven Central - scriptengine-jshell](https://img.shields.io/maven-central/v/ch.obermuhlner/scriptengine-jshell.svg)](https://search.maven.org/artifact/ch.obermuhlner/scriptengine-jshell)
 
 
-## JShell scripting engine
+# JShell scripting engine
 
 The JShell was introduced with Java 9 and was designed to be used for interactive execution of code snippets in Java.
 
-### Using JShell scripting engine in your projects 
+## Using JShell scripting engine in your projects 
 
 To use the JShell scripting you can either download the newest version of the .jar file from the
 [published releases on Github](https://github.com/eobermuhlner/java-scriptengine/releases/)
@@ -21,7 +21,7 @@ or use the following dependency to
 [Maven Central](https://search.maven.org/#search%7Cga%7C1%7Cscriptengine-jshell)
 in your build script (please verify the version number to be the newest release):
 
-#### Use JShell scripting engine in Maven build
+### Use JShell scripting engine in Maven build
 
 ```xml
 <dependency>
@@ -31,7 +31,7 @@ in your build script (please verify the version number to be the newest release)
 </dependency>
 ```
 
-#### Use JShell scripting engine in Gradle build
+### Use JShell scripting engine in Gradle build
 
 ```gradle
 repositories {
@@ -43,7 +43,7 @@ dependencies {
 }
 ```
 
-### Simple usage
+## Simple usage
 
 The following code snippet shows a simple usage of the JShell script engine:
 ```java
@@ -80,7 +80,7 @@ Result: 1005
 Output Variable: 5
 ```
 
-### Access to classes
+## Access to classes
 
 The JShell script is executed in the same process 
 and has therefore access to the same classes.
@@ -129,7 +129,7 @@ Result: 1967
 Person Variable: Person{name=Eric, birthYear=1967}
 ```
 
-### Error handling
+## Error handling
 
 ```java
 try {
