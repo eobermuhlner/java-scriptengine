@@ -11,6 +11,7 @@ public class ScriptEngineExample {
 
         runBindingExample();
         runVisibleClassesExample();
+        runErrorExample();
     }
 
     private static void runExample(String engineName, String script) {
@@ -66,10 +67,24 @@ public class ScriptEngineExample {
 
             Object person = engine.get("person");
             System.out.println("Person Variable: " + person);
-
         } catch (ScriptException e) {
             e.printStackTrace();
         }
     }
 
+    private static void runErrorExample() {
+        try {
+            ScriptEngineManager manager = new ScriptEngineManager();
+            ScriptEngine engine = manager.getEngineByName("jshell");
+
+            String script = "" +
+                    "System.out.println(unknown);" +
+                    "var message = \"Should never reach this point\"";
+
+            Object result = engine.eval(script);
+            System.out.println("Result: " + result);
+        } catch (ScriptException e) {
+            e.printStackTrace();
+        }
+    }
 }

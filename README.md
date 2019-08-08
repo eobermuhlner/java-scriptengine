@@ -43,6 +43,8 @@ Result: 1005
 Output Variable: 5
 ```
 
+### Access to classes
+
 The JShell script is executed in the same process 
 and has therefore access to the same classes.
 
@@ -88,4 +90,36 @@ The console output of this snippet shows that the variable `person` created insi
 ```console
 Result: 1967
 Person Variable: Person{name=Eric, birthYear=1967}
+```
+
+### Error handling
+
+```java
+try {
+    ScriptEngineManager manager = new ScriptEngineManager();
+    ScriptEngine engine = manager.getEngineByName("jshell");
+
+    String script = "" +
+            "System.out.println(unknown);" +
+            "var message = \"Should never reach this point\"";
+
+    Object result = engine.eval(script);
+    System.out.println("Result: " + result);
+} catch (ScriptException e) {
+    e.printStackTrace();
+}
+```
+
+The console output of this snippet shows that the variable `unknown` cannot be found:
+```console
+javax.script.ScriptException: cannot find symbol
+  symbol:   variable unknown
+  location: class 
+System.out.println(unknown);
+	at ch.obermuhlner.scriptengine.jshell.JShellScriptEngine.evaluateScript(JShellScriptEngine.java:216)
+	at ch.obermuhlner.scriptengine.jshell.JShellScriptEngine.eval(JShellScriptEngine.java:98)
+	at ch.obermuhlner.scriptengine.jshell.JShellScriptEngine.eval(JShellScriptEngine.java:84)
+	at ch.obermuhlner.scriptengine.jshell.JShellScriptEngine.eval(JShellScriptEngine.java:74)
+	at ch.obermuhlner.scriptengine.example.ScriptEngineExample.runErrorExample(ScriptEngineExample.java:84)
+	at ch.obermuhlner.scriptengine.example.ScriptEngineExample.main(ScriptEngineExample.java:14)
 ```
