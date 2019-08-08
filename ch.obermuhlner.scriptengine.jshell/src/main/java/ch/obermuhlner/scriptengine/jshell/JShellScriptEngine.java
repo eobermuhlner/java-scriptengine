@@ -7,10 +7,7 @@ import javax.script.*;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.Reader;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 public class JShellScriptEngine implements ScriptEngine {
     private ScriptContext context = new SimpleScriptContext();
@@ -96,18 +93,40 @@ public class JShellScriptEngine implements ScriptEngine {
     }
 
     private static Map<String, Object> staticVariables;
-    private void pushVariables(Bindings... bindingsToPush) throws ScriptException {
-        staticVariables = mergeBindings(bindingsToPush);
-        for (Map.Entry<String, Object> entry : staticVariables.entrySet()) {
-            String name = entry.getKey();
-            Object value = entry.getValue();
+    private void pushVariables(Bindings globalBindings, Bindings engineBindings) throws ScriptException {
+        staticVariables = mergeBindings(globalBindings, engineBindings);
+
+        Set<String> remainingKeys = new HashSet<>(staticVariables.keySet());
+
+        try {
+            jshell.variables().forEach(varSnippet -> {
+                String name = varSnippet.name();
+                if (remainingKeys.contains(name)) {
+                    remainingKeys.remove(name);
+                    try {
+                        Object value = getVariableValue(name);
+                        String type = determineType(value);
+                        String script = name + " = (" + type + ") " + getClass().getName() + ".getVariableValue(\"" + name + "\");";
+                        evaluateScript(script);
+                    } catch (ScriptException e) {
+                        throw new ScriptRuntimeException(e);
+                    }
+                }
+            });
+        } catch (ScriptRuntimeException e) {
+            throw (ScriptException) e.getCause();
+        }
+
+
+        for (String name : remainingKeys) {
+            Object value = getVariableValue(name);
             String type = determineType(value);
             String script = "var " + name + " = (" + type + ") " + getClass().getName() + ".getVariableValue(\"" + name + "\");";
             evaluateScript(script);
         }
     }
 
-    private void pullVariables(Bindings... bindingsToPull) throws ScriptException {
+    private void pullVariables(Bindings globalBindings, Bindings engineBindings) throws ScriptException {
         try {
             jshell.variables().forEach(varSnippet -> {
                 String name = varSnippet.name();
@@ -115,17 +134,21 @@ public class JShellScriptEngine implements ScriptEngine {
                 try {
                     evaluateScript(script);
                     Object value = getVariableValue(name);
-                    for (Bindings bindings : bindingsToPull) {
-                        if (bindings != null && bindings.containsKey(name)) {
-                            bindings.put(name, value);
-                        }
-                    }
+                    setBindingsValue(globalBindings, engineBindings, name, value);
                 } catch (ScriptException e) {
                     throw new ScriptRuntimeException(e);
                 }
             });
         } catch (ScriptRuntimeException e) {
             throw (ScriptException) e.getCause();
+        }
+    }
+
+    private void setBindingsValue(Bindings globalBindings, Bindings engineBindings, String name, Object value) {
+        if (!engineBindings.containsKey(name) && globalBindings.containsKey(name)) {
+            globalBindings.put(name, value);
+        } else {
+            engineBindings.put(name, value);
         }
     }
 
