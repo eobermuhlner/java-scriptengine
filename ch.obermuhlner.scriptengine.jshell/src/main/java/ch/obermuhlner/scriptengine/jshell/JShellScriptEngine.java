@@ -1,12 +1,16 @@
 package ch.obermuhlner.scriptengine.jshell;
 
 import jdk.jshell.*;
-import jdk.jshell.execution.LocalExecutionControlProvider;
+import jdk.jshell.execution.DirectExecutionControl;
+import jdk.jshell.spi.ExecutionControl;
+import jdk.jshell.spi.ExecutionControlProvider;
+import jdk.jshell.spi.ExecutionEnv;
 
 import javax.script.*;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.Reader;
+import java.lang.reflect.Method;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -14,8 +18,10 @@ public class JShellScriptEngine implements ScriptEngine {
 
     private ScriptContext context = new SimpleScriptContext();
 
+    private final AccessDirectExecutionControl accessDirectExecutionControl = new AccessDirectExecutionControl();
+
     private final JShell jshell = JShell.builder()
-            .executionEngine(new LocalExecutionControlProvider(), null)
+            .executionEngine(new AccessDirectExecutionControlProvider(accessDirectExecutionControl), null)
             .build();
 
     @Override
@@ -201,7 +207,7 @@ public class JShellScriptEngine implements ScriptEngine {
                 }
 
                 if (event.status() == Snippet.Status.VALID) {
-                    result = event.value();
+                    result = accessDirectExecutionControl.getLastValue();
                 } else {
                     Snippet snippet = event.snippet();
                     Optional<Diag> optionalDiag = jshell.diagnostics(snippet).findAny();
@@ -260,6 +266,38 @@ public class JShellScriptEngine implements ScriptEngine {
     private static class ScriptRuntimeException extends RuntimeException {
         public ScriptRuntimeException(ScriptException cause) {
             super(cause);
+        }
+    }
+
+    private static class AccessDirectExecutionControl extends DirectExecutionControl {
+        private Object lastValue;
+
+        @Override
+        protected String invoke(Method doitMethod) throws Exception {
+            lastValue = doitMethod.invoke(null, new Object[0]);
+            return valueString(lastValue);
+        }
+
+        public Object getLastValue() {
+            return lastValue;
+        }
+    }
+
+    private static class AccessDirectExecutionControlProvider implements ExecutionControlProvider {
+        private AccessDirectExecutionControl accessDirectExecutionControl;
+
+        AccessDirectExecutionControlProvider(AccessDirectExecutionControl accessDirectExecutionControl) {
+            this.accessDirectExecutionControl = accessDirectExecutionControl;
+        }
+
+        @Override
+        public String name() {
+            return "accessdirect";
+        }
+
+        @Override
+        public ExecutionControl generate(ExecutionEnv env, Map<String, String> parameters) throws Throwable {
+            return accessDirectExecutionControl;
         }
     }
 }

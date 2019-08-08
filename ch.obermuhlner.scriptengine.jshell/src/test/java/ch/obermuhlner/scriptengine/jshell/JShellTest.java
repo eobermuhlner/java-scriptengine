@@ -1,5 +1,6 @@
 package ch.obermuhlner.scriptengine.jshell;
 
+import org.junit.Ignore;
 import org.junit.Test;
 
 import javax.script.*;
@@ -14,7 +15,18 @@ public class JShellTest {
 
     @Test
     public void testSimple() throws ScriptException {
-        assertScript("2+3", "5");
+        assertScript("2+3", 5);
+    }
+
+    @Test
+    public void testSimpleDeclareVariable() throws ScriptException {
+        assertScript("var alpha = 123", 123);
+    }
+
+    @Ignore("lastValue() has no access to default value of declarations")
+    @Test
+    public void testSimpleDeclareIntVariable() throws ScriptException {
+        assertScript("int alpha", 123);
     }
 
     @Test
@@ -57,7 +69,7 @@ public class JShellTest {
         engine.put("gamma", 0);
 
         Object result = engine.eval("gamma = alpha + beta");
-        assertEquals("5", result);
+        assertEquals(5, result);
         assertEquals(5, engine.get("gamma"));
     }
 
@@ -69,7 +81,7 @@ public class JShellTest {
         engine.put("beta", 3);
 
         Object result = engine.eval("var gamma = alpha + beta");
-        assertEquals("5", result);
+        assertEquals(5, result);
         assertEquals(5, engine.get("gamma"));
     }
 
@@ -82,11 +94,11 @@ public class JShellTest {
         engine.put("gamma", 0);
 
         Object result = engine.eval("gamma = alpha + beta");
-        assertEquals("5", result);
+        assertEquals(5, result);
         assertEquals(5, engine.get("gamma"));
 
         Object result2 = engine.eval("gamma = alpha + beta + gamma");
-        assertEquals("10", result2);
+        assertEquals(10, result2);
         assertEquals(10, engine.get("gamma"));
     }
 
@@ -100,7 +112,7 @@ public class JShellTest {
         globalBindings.put("gamma", 0);
 
         Object result = engine.eval("gamma = alpha + beta");
-        assertEquals("5", result);
+        assertEquals(5, result);
         assertEquals(null, engine.get("gamma"));
         assertEquals(5, globalBindings.get("gamma"));
     }
@@ -120,7 +132,7 @@ public class JShellTest {
         assertEquals(0, globalBindings.get("gamma"));
 
         Object result = engine.eval("gamma = alpha + beta");
-        assertEquals("5", result);
+        assertEquals(5, result);
         assertEquals(5, engine.get("gamma"));
         assertEquals(0, globalBindings.get("gamma"));
     }
@@ -134,7 +146,7 @@ public class JShellTest {
         engine.put("alpha", publicClass);
 
         Object result = engine.eval("var message = alpha.message");
-        assertEquals("\"hello\"", result);
+        assertEquals("hello", result);
         assertSame(publicClass, engine.get("alpha"));
         assertEquals("hello", engine.get("message"));
     }
@@ -148,7 +160,7 @@ public class JShellTest {
         engine.put("alpha", publicClass);
 
         Object result = engine.eval("var message = alpha.message");
-        assertEquals("\"hello\"", result);
+        assertEquals("hello", result);
         assertSame(publicClass, engine.get("alpha"));
         assertEquals("hello", engine.get("message"));
     }
