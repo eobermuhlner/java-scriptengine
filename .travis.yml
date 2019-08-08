@@ -1,0 +1,18 @@
+language: java
+jdk:
+  - oraclejdk9
+
+after_success:
+  - bash <(curl -s https://codecov.io/bash)
+
+# set sudo to required, because this setup gets more memory
+sudo: required
+
+# keep gradle cache
+before_cache:
+  - rm -f  $HOME/.gradle/caches/modules-2/modules-2.lock
+  - rm -fr $HOME/.gradle/caches/*/plugin-resolution/
+cache:
+  directories:
+    - $HOME/.gradle/caches/
+    - $HOME/.gradle/wrapper/
