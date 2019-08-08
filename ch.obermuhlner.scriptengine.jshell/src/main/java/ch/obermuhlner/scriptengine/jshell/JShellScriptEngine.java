@@ -86,23 +86,46 @@ public class JShellScriptEngine implements ScriptEngine {
     @Override
     public Object eval(String script, Bindings bindings) throws ScriptException {
         Bindings globalBindings = context.getBindings(ScriptContext.GLOBAL_SCOPE);
-        Map<String, Object> variables = mergeBindings(globalBindings, bindings);
-        pushVariables(variables);
+        pushVariables(globalBindings, bindings);
 
         Object result = evaluateScript(script);
+
+        pullVariables(globalBindings, bindings);
 
         return result;
     }
 
     private static Map<String, Object> staticVariables;
-    private void pushVariables(Map<String, Object> variables) throws ScriptException {
-        staticVariables = variables;
-        for (Map.Entry<String, Object> entry : variables.entrySet()) {
+    private void pushVariables(Bindings... bindingsToPush) throws ScriptException {
+        staticVariables = mergeBindings(bindingsToPush);
+        for (Map.Entry<String, Object> entry : staticVariables.entrySet()) {
             String name = entry.getKey();
             Object value = entry.getValue();
             String type = determineType(value);
             String script = "var " + name + " = (" + type + ") " + getClass().getName() + ".getVariableValue(\"" + name + "\");";
             evaluateScript(script);
+        }
+    }
+
+    private void pullVariables(Bindings... bindingsToPull) throws ScriptException {
+        try {
+            jshell.variables().forEach(varSnippet -> {
+                String name = varSnippet.name();
+                String script = getClass().getName() + ".setVariableValue(\"" + name + "\", " + name + ");";
+                try {
+                    evaluateScript(script);
+                    Object value = getVariableValue(name);
+                    for (Bindings bindings : bindingsToPull) {
+                        if (bindings != null && bindings.containsKey(name)) {
+                            bindings.put(name, value);
+                        }
+                    }
+                } catch (ScriptException e) {
+                    throw new ScriptRuntimeException(e);
+                }
+            });
+        } catch (ScriptRuntimeException e) {
+            throw (ScriptException) e.getCause();
         }
     }
 
@@ -189,6 +212,12 @@ public class JShellScriptEngine implements ScriptEngine {
             return s.toString();
         } catch (IOException e) {
             throw new ScriptException(e);
+        }
+    }
+
+    private static class ScriptRuntimeException extends RuntimeException {
+        public ScriptRuntimeException(ScriptException cause) {
+            super(cause);
         }
     }
 }

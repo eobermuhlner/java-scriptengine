@@ -36,8 +36,11 @@ public class JShellTest {
         ScriptEngine engine = manager.getEngineByName("jshell");
         engine.put("alpha", 2);
         engine.put("beta", 3);
-        Object result = engine.eval("alpha + beta");
+        engine.put("gamma", 0);
+        Object result = engine.eval("gamma = alpha + beta");
         assertEquals("5", result);
+
+        assertEquals(5, engine.get("gamma"));
     }
 
     private void assertScript(String script, Object expectedResult) throws ScriptException {
