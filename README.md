@@ -9,7 +9,7 @@ A collection of JSR-223 compatible script engines for Java.
 
 Currently supported script engines are:
 * JShell [![Maven Central - scriptengine-jshell](https://img.shields.io/maven-central/v/ch.obermuhlner/scriptengine-jshell.svg)](https://search.maven.org/artifact/ch.obermuhlner/scriptengine-jshell)
-
+* Spring Expression Language (SpEL)
 
 # JShell scripting engine
 
@@ -162,3 +162,83 @@ System.out.println(unknown);
 	at ch.obermuhlner.scriptengine.example.ScriptEngineExample.runErrorExample(ScriptEngineExample.java:84)
 	at ch.obermuhlner.scriptengine.example.ScriptEngineExample.main(ScriptEngineExample.java:14)
 ```
+
+# Spring Expression Language
+
+The Spring Expression Language (SpEL) is a powerful expression language that supports querying and manipulating an object graph at runtime.
+
+Refer to the [4.2.x Spring Documentation](https://docs.spring.io/spring/docs/4.2.x/spring-framework-reference/html/expressions.html)
+for details.
+
+The following example shows how to execute a simple SpEL script with variables:
+```java
+try {
+    ScriptEngineManager manager = new ScriptEngineManager();
+    ScriptEngine engine = manager.getEngineByName("spel");
+
+    engine.put("inputA", 2);
+    engine.put("inputB", 3);
+    engine.put("output", 0);
+
+    String script = "" +
+            "#output = #inputA + #inputB";
+
+    Object result = engine.eval(script);
+    System.out.println("Result: " + result);
+
+    Object output = engine.get("output");
+    System.out.println("Output Variable: " + output);
+} catch (ScriptException e) {
+    e.printStackTrace();
+}
+```
+
+The console output shows that the `output` variable was modified by the script:
+```console
+Result: 5
+Output Variable: 5
+```
+
+Since SpEL has the concept of a root object that is passed into expression
+the `JShellScriptEngine` provides a special variable `ROOT`.
+
+```java
+public class Person {
+    public String name;
+    public int birthYear;
+
+    @Override
+    public String toString() {
+        return "Person{name=" + name + ", birthYear=" + birthYear + "}";
+    }
+}
+```
+
+```java
+try {
+    ScriptEngineManager manager = new ScriptEngineManager();
+    ScriptEngine engine = manager.getEngineByName("spel");
+
+    Person person = new Person();
+    person.name = "Eric";
+    person.birthYear = 1967;
+    engine.put(SpringExpressionScriptEngine.ROOT, person);
+
+    String script = "" +
+            "name+birthYear";
+
+    Object result = engine.eval(script);
+    System.out.println("Result: " + result);
+} catch (ScriptException e) {
+    e.printStackTrace();
+}
+```
+
+```console
+Result: Eric1967
+```
+
+
+
+
+ 
