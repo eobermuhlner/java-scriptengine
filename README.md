@@ -200,7 +200,7 @@ Output Variable: 5
 ```
 
 Since SpEL has the concept of a root object that is passed into expression
-the `JShellScriptEngine` provides a special variable `ROOT`.
+the `SpringExpressionScriptEngine` provides a special variable `ROOT`.
 
 ```java
 public class Person {
