@@ -77,12 +77,7 @@ public class JShellScriptEngineFactory implements ScriptEngineFactory {
 
     @Override
     public String getOutputStatement(String toDisplay) {
-        String escapedToDisplay = toDisplay
-                .replace("\\", "\\\\")
-                .replace("\"", "\\\"")
-                .replace("\n", "\\n")
-                .replace("\t", "\\t");
-        return "System.out.println(" + escapedToDisplay + ")";
+        return "System.out.println(" + toDisplay + ")";
     }
 
     @Override

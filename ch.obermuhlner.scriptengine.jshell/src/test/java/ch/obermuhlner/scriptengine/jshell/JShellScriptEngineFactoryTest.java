@@ -71,6 +71,12 @@ public class JShellScriptEngineFactoryTest {
     }
 
     @Test
+    public void testGetOutputStatement() {
+        JShellScriptEngineFactory factory = new JShellScriptEngineFactory();
+        assertEquals("System.out.println(alpha)", factory.getOutputStatement("alpha"));
+    }
+
+    @Test
     public void testGetProgram() {
         JShellScriptEngineFactory factory = new JShellScriptEngineFactory();
         assertEquals("", factory.getProgram());
