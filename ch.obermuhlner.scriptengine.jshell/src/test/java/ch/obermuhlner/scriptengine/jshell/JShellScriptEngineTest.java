@@ -263,7 +263,7 @@ public class JShellScriptEngineTest {
 
         assertThatThrownBy(() -> {
             engine.put("illegal with spaces", 2);
-            Object result = engine.eval("var message = alpha.message");
+            Object result = engine.eval("1234");
         }).isInstanceOf(ScriptException.class);
     }
 

@@ -114,16 +114,14 @@ public class JShellScriptEngine implements ScriptEngine {
         try {
             jshell.variables().forEach(varSnippet -> {
                 String name = varSnippet.name();
-                if (remainingKeys.contains(name)) {
-                    remainingKeys.remove(name);
-                    try {
-                        Object value = getVariableValue(name);
-                        String type = determineType(value);
-                        String script = name + " = (" + type + ") " + getClass().getName() + ".getVariableValue(\"" + name + "\");";
-                        evaluateScript(script);
-                    } catch (ScriptException e) {
-                        throw new ScriptRuntimeException(e);
-                    }
+                remainingKeys.remove(name);
+                try {
+                    Object value = getVariableValue(name);
+                    String type = determineType(value);
+                    String script = name + " = (" + type + ") " + getClass().getName() + ".getVariableValue(\"" + name + "\");";
+                    evaluateScript(script);
+                } catch (ScriptException e) {
+                    throw new ScriptRuntimeException(e);
                 }
             });
         } catch (ScriptRuntimeException e) {
