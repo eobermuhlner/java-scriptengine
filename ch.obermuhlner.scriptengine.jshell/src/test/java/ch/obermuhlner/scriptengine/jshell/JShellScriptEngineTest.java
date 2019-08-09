@@ -8,7 +8,9 @@ import javax.script.*;
 import java.io.Reader;
 import java.io.StringReader;
 
-import static org.junit.Assert.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.fail;
+
 
 public class JShellScriptEngineTest {
     @Test
@@ -72,8 +74,9 @@ public class JShellScriptEngineTest {
         engine.put("gamma", 0);
 
         Object result = engine.eval("gamma = alpha + beta");
-        assertEquals(5, result);
-        assertEquals(5, engine.get("gamma"));
+
+        assertThat(result).isEqualTo(5);
+        assertThat(engine.get("gamma")).isEqualTo(5);
     }
 
     @Test
@@ -84,8 +87,8 @@ public class JShellScriptEngineTest {
         engine.put("beta", 3);
 
         Object result = engine.eval("var gamma = alpha + beta");
-        assertEquals(5, result);
-        assertEquals(5, engine.get("gamma"));
+        assertThat(result).isEqualTo(5);
+        assertThat(engine.get("gamma")).isEqualTo(5);
     }
 
     @Test
@@ -97,12 +100,12 @@ public class JShellScriptEngineTest {
         engine.put("gamma", 0);
 
         Object result = engine.eval("gamma = alpha + beta");
-        assertEquals(5, result);
-        assertEquals(5, engine.get("gamma"));
+        assertThat(result).isEqualTo(5);
+        assertThat(engine.get("gamma")).isEqualTo(5);
 
         Object result2 = engine.eval("gamma = alpha + beta + gamma");
-        assertEquals(10, result2);
-        assertEquals(10, engine.get("gamma"));
+        assertThat(result2).isEqualTo(10);
+        assertThat(engine.get("gamma")).isEqualTo(10);
     }
 
     @Test
@@ -115,9 +118,9 @@ public class JShellScriptEngineTest {
         globalBindings.put("gamma", 0);
 
         Object result = engine.eval("gamma = alpha + beta");
-        assertEquals(5, result);
-        assertEquals(null, engine.get("gamma"));
-        assertEquals(5, globalBindings.get("gamma"));
+        assertThat(result).isEqualTo(5);
+        assertThat(engine.get("gamma")).isEqualTo(null);
+        assertThat(globalBindings.get("gamma")).isEqualTo(5);
     }
 
     @Test
@@ -131,13 +134,13 @@ public class JShellScriptEngineTest {
 
         engine.put("gamma", 999);
 
-        assertEquals(999, engine.get("gamma"));
-        assertEquals(0, globalBindings.get("gamma"));
+        assertThat(engine.get("gamma")).isEqualTo(999);
+        assertThat(globalBindings.get("gamma")).isEqualTo(0);
 
         Object result = engine.eval("gamma = alpha + beta");
-        assertEquals(5, result);
-        assertEquals(5, engine.get("gamma"));
-        assertEquals(0, globalBindings.get("gamma"));
+        assertThat(result).isEqualTo(5);
+        assertThat(engine.get("gamma")).isEqualTo(5);
+        assertThat(globalBindings.get("gamma")).isEqualTo(0);
     }
 
     @Test
@@ -149,9 +152,9 @@ public class JShellScriptEngineTest {
         engine.put("alpha", publicClass);
 
         Object result = engine.eval("var message = alpha.message");
-        assertEquals("hello", result);
-        assertSame(publicClass, engine.get("alpha"));
-        assertEquals("hello", engine.get("message"));
+        assertThat(result).isEqualTo("hello");
+        assertThat(engine.get("alpha")).isSameAs(publicClass);
+        assertThat(engine.get("message")).isEqualTo("hello");
     }
 
     @Test(expected = ScriptException.class)
@@ -172,8 +175,8 @@ public class JShellScriptEngineTest {
         engine.put("alpha", privateClass);
 
         Object result = engine.eval("Object beta = alpha");
-        assertSame(privateClass, engine.get("alpha"));
-        assertSame(privateClass, engine.get("beta"));
+        assertThat(engine.get("alpha")).isSameAs(privateClass);
+        assertThat(engine.get("beta")).isSameAs(privateClass);
     }
 
     @Test(expected = ScriptException.class)
@@ -194,8 +197,8 @@ public class JShellScriptEngineTest {
         engine.put("alpha", protectedClass);
 
         Object result = engine.eval("Object beta = alpha");
-        assertSame(protectedClass, engine.get("alpha"));
-        assertSame(protectedClass, engine.get("beta"));
+        assertThat(engine.get("alpha")).isSameAs(protectedClass);
+        assertThat(engine.get("beta")).isSameAs(protectedClass);
     }
 
     @Test(expected = ScriptException.class)
@@ -214,7 +217,7 @@ public class JShellScriptEngineTest {
 
         Reader reader = new StringReader("1234");
         Object result = engine.eval(reader);
-        assertEquals(1234, result);
+        assertThat(result).isEqualTo(1234);
     }
 
     @Test
@@ -226,7 +229,7 @@ public class JShellScriptEngineTest {
         context.getBindings(ScriptContext.ENGINE_SCOPE).put("alpha", 1000);
         Reader reader = new StringReader("alpha+999");
         Object result = engine.eval(reader, context);
-        assertEquals(1999, result);
+        assertThat(result).isEqualTo(1999);
     }
 
     @Test
@@ -238,7 +241,7 @@ public class JShellScriptEngineTest {
         bindings.put("alpha", 1000);
         Reader reader = new StringReader("alpha+321");
         Object result = engine.eval(reader, bindings);
-        assertEquals(1321, result);
+        assertThat(result).isEqualTo(1321);
     }
 
     @Test
@@ -246,11 +249,11 @@ public class JShellScriptEngineTest {
         ScriptEngineManager manager = new ScriptEngineManager();
         ScriptEngine engine = manager.getEngineByName("jshell");
 
-        assertNotNull(engine.getContext());
+        assertThat(engine.getContext()).isNotNull();
 
         SimpleScriptContext context = new SimpleScriptContext();
         engine.setContext(context);
-        assertSame(context, engine.getContext());
+        assertThat(engine.getContext()).isSameAs(context);
     }
 
     @Test(expected = NullPointerException.class)
@@ -267,19 +270,20 @@ public class JShellScriptEngineTest {
         ScriptEngine engine = manager.getEngineByName("jshell");
 
         ScriptEngineFactory factory = engine.getFactory();
-        assertSame(JShellScriptEngineFactory.class, factory.getClass());
+        assertThat(factory.getClass()).isSameAs(JShellScriptEngineFactory.class);
     }
 
     private void assertScript(String script, Object expectedResult) throws ScriptException {
         ScriptEngineManager manager = new ScriptEngineManager();
         ScriptEngine engine = manager.getEngineByName("jshell");
         Object result = engine.eval(script);
-        assertEquals(expectedResult, result);
+        assertThat(result).isEqualTo(expectedResult);
     }
 
     private void assertScriptThrows(String script, Class<? extends Throwable> throwableClass) {
         try {
             assertScript(script, "Should never reach the result");
+
             fail("Expected throwing: " + throwableClass.getName());
         } catch (Throwable throwable) {
             System.out.println(throwable.getClass().getName() + " : " + throwable.getMessage());

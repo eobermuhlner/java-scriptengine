@@ -5,89 +5,89 @@ import org.junit.Test;
 import javax.script.ScriptEngine;
 import java.util.Arrays;
 
-import static org.junit.Assert.assertEquals;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertTrue;
 
 public class JShellScriptEngineFactoryTest {
     @Test
     public void testGetEngineName() {
         JShellScriptEngineFactory factory = new JShellScriptEngineFactory();
-        assertEquals("JShell ScriptEngine", factory.getEngineName());
+        assertThat(factory.getEngineName()).isEqualTo("JShell ScriptEngine");
     }
 
     @Test
     public void testGetEngineVersion() {
         JShellScriptEngineFactory factory = new JShellScriptEngineFactory();
-        assertEquals("0.1.0", factory.getEngineVersion());
+        assertThat(factory.getEngineVersion()).isEqualTo("0.1.0");
     }
 
     @Test
     public void testGetLanguageName() {
         JShellScriptEngineFactory factory = new JShellScriptEngineFactory();
-        assertEquals("JShell", factory.getLanguageName());
+        assertThat(factory.getLanguageName()).isEqualTo("JShell");
     }
 
     @Test
     public void testGetLanguageVersion() {
         JShellScriptEngineFactory factory = new JShellScriptEngineFactory();
-        assertEquals("9", factory.getLanguageVersion());
+        assertThat(factory.getLanguageVersion()).isEqualTo("9");
     }
 
     @Test
     public void testGetExtensions() {
         JShellScriptEngineFactory factory = new JShellScriptEngineFactory();
-        assertEquals(Arrays.asList("jsh", "jshell"), factory.getExtensions());
+        assertThat(factory.getExtensions()).isEqualTo(Arrays.asList("jsh", "jshell"));
     }
 
     @Test
     public void testGetMimeTypes() {
         JShellScriptEngineFactory factory = new JShellScriptEngineFactory();
-        assertEquals(Arrays.asList("text/x-jshell-source"), factory.getMimeTypes());
+        assertThat(factory.getMimeTypes()).isEqualTo(Arrays.asList("text/x-jshell-source"));
     }
 
     @Test
     public void testGetNames() {
         JShellScriptEngineFactory factory = new JShellScriptEngineFactory();
-        assertEquals(Arrays.asList("JShell", "jshell", "ch.obermuhlner:scriptengine-jshell", "obermuhlner-jshell"), factory.getNames());
+        assertThat(factory.getNames()).isEqualTo(Arrays.asList("JShell", "jshell", "ch.obermuhlner:scriptengine-jshell", "obermuhlner-jshell"));
     }
 
     @Test
     public void testGetParameters() {
         JShellScriptEngineFactory factory = new JShellScriptEngineFactory();
-        assertEquals(factory.getEngineName(), factory.getParameter(ScriptEngine.ENGINE));
-        assertEquals(factory.getEngineVersion(), factory.getParameter(ScriptEngine.ENGINE_VERSION));
-        assertEquals(factory.getLanguageName(), factory.getParameter(ScriptEngine.LANGUAGE));
-        assertEquals(factory.getLanguageVersion(), factory.getParameter(ScriptEngine.LANGUAGE_VERSION));
-        assertEquals("JShell", factory.getParameter(ScriptEngine.NAME));
-        assertEquals(null, factory.getParameter("unknown"));
+        assertThat(factory.getParameter(ScriptEngine.ENGINE)).isEqualTo(factory.getEngineName());
+        assertThat(factory.getParameter(ScriptEngine.ENGINE_VERSION)).isEqualTo(factory.getEngineVersion());
+        assertThat(factory.getParameter(ScriptEngine.LANGUAGE)).isEqualTo(factory.getLanguageName());
+        assertThat(factory.getParameter(ScriptEngine.LANGUAGE_VERSION)).isEqualTo(factory.getLanguageVersion());
+        assertThat(factory.getParameter(ScriptEngine.NAME)).isEqualTo("JShell");
+        assertThat(factory.getParameter("unknown")).isEqualTo(null);
     }
 
     @Test
     public void testGetMethodCallSyntax() {
         JShellScriptEngineFactory factory = new JShellScriptEngineFactory();
-        assertEquals("obj.method()", factory.getMethodCallSyntax("obj", "method"));
-        assertEquals("obj.method(alpha)", factory.getMethodCallSyntax("obj", "method", "alpha"));
-        assertEquals("obj.method(alpha,beta)", factory.getMethodCallSyntax("obj", "method", "alpha", "beta"));
+        assertThat(factory.getMethodCallSyntax("obj", "method")).isEqualTo("obj.method()");
+        assertThat(factory.getMethodCallSyntax("obj", "method", "alpha")).isEqualTo("obj.method(alpha)");
+        assertThat(factory.getMethodCallSyntax("obj", "method", "alpha", "beta")).isEqualTo("obj.method(alpha,beta)");
     }
 
     @Test
     public void testGetOutputStatement() {
         JShellScriptEngineFactory factory = new JShellScriptEngineFactory();
-        assertEquals("System.out.println(alpha)", factory.getOutputStatement("alpha"));
+        assertThat(factory.getOutputStatement("alpha")).isEqualTo("System.out.println(alpha)");
     }
 
     @Test
     public void testGetProgram() {
         JShellScriptEngineFactory factory = new JShellScriptEngineFactory();
-        assertEquals("", factory.getProgram());
-        assertEquals("alpha;\n", factory.getProgram("alpha"));
-        assertEquals("alpha;\nbeta;\n", factory.getProgram("alpha", "beta"));
+        assertThat(factory.getProgram()).isEqualTo("");
+        assertThat(factory.getProgram("alpha")).isEqualTo("alpha;\n");
+        assertThat(factory.getProgram("alpha", "beta")).isEqualTo("alpha;\nbeta;\n");
     }
 
     @Test
     public void testGetScriptEngine() {
         JShellScriptEngineFactory factory = new JShellScriptEngineFactory();
-        assertTrue(factory.getScriptEngine() instanceof JShellScriptEngine);
+        assertThat(factory.getScriptEngine() instanceof JShellScriptEngine).isTrue();
     }
 
 }
