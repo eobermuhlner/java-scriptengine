@@ -8,8 +8,7 @@ import javax.script.*;
 import java.io.Reader;
 import java.io.StringReader;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.fail;
+import static org.assertj.core.api.Assertions.*;
 
 
 public class JShellScriptEngineTest {
@@ -36,33 +35,43 @@ public class JShellScriptEngineTest {
 
     @Test
     public void testFailUnknownVariable() {
-        assertScriptThrows("unknown", ScriptException.class);
+        assertThatThrownBy(() -> {
+            assertScript("unknown", null);
+        }).isInstanceOf(ScriptException.class);
     }
 
     @Test
     public void testFailIncompleteScript() {
-        assertScriptThrows("foo(", ScriptException.class);
+        assertThatThrownBy(() -> {
+            assertScript("foo(", null);
+        }).isInstanceOf(ScriptException.class);
     }
 
     @Test
     public void testFailSameVariable() {
-        assertScriptThrows("" +
-                "var alpha = 0;" +
-                "var alpha = 1;",
-                ScriptException.class);
+        assertThatThrownBy(() -> {
+            assertScript("" +
+                    "var alpha = 0;" +
+                    "var alpha = 1;",
+                    null);
+        }).isInstanceOf(ScriptException.class);
     }
 
     @Test
     public void testFailEvalDivByZero() {
-        assertScriptThrows("1/0", ScriptException.class);
+        assertThatThrownBy(() -> {
+            assertScript("1/0", null);
+        }).isInstanceOf(ScriptException.class);
     }
 
     @Test
     public void testFailEvalNullPointerException() {
-        assertScriptThrows("" +
-                "Object foo = null;" +
-                "foo.toString()",
-                ScriptException.class);
+        assertThatThrownBy(() -> {
+            assertScript("" +
+                    "Object foo = null;" +
+                    "foo.toString()",
+                    null);
+        }).isInstanceOf(ScriptException.class);
     }
 
     @Test
@@ -254,14 +263,10 @@ public class JShellScriptEngineTest {
         SimpleScriptContext context = new SimpleScriptContext();
         engine.setContext(context);
         assertThat(engine.getContext()).isSameAs(context);
-    }
 
-    @Test(expected = NullPointerException.class)
-    public void testSetContextFail() throws ScriptException {
-        ScriptEngineManager manager = new ScriptEngineManager();
-        ScriptEngine engine = manager.getEngineByName("jshell");
-
-        engine.setContext(null);
+        assertThatThrownBy(() -> {
+            engine.setContext(null);
+        }).isInstanceOf(NullPointerException.class);
     }
 
     @Test
@@ -278,19 +283,6 @@ public class JShellScriptEngineTest {
         ScriptEngine engine = manager.getEngineByName("jshell");
         Object result = engine.eval(script);
         assertThat(result).isEqualTo(expectedResult);
-    }
-
-    private void assertScriptThrows(String script, Class<? extends Throwable> throwableClass) {
-        try {
-            assertScript(script, "Should never reach the result");
-
-            fail("Expected throwing: " + throwableClass.getName());
-        } catch (Throwable throwable) {
-            System.out.println(throwable.getClass().getName() + " : " + throwable.getMessage());
-            if (!throwable.getClass().isAssignableFrom(throwableClass)) {
-                fail("Expected throwing: " + throwableClass.getName() + " but was thrown: " + throwable.getClass().getName());
-            }
-        }
     }
 
     public static class PublicClass {
