@@ -166,14 +166,16 @@ public class JShellScriptEngineTest {
         assertThat(engine.get("message")).isEqualTo("hello");
     }
 
-    @Test(expected = ScriptException.class)
+    @Test
     public void testBindingsPrivateClassFail() throws ScriptException {
         ScriptEngineManager manager = new ScriptEngineManager();
         ScriptEngine engine = manager.getEngineByName("jshell");
         PrivateClass privateClass = new PrivateClass();
         engine.put("alpha", privateClass);
 
-        Object result = engine.eval("ch.obermuhlner.scriptengine.jshell.PrivateClass beta = alpha");
+        assertThatThrownBy(() -> {
+            Object result = engine.eval("ch.obermuhlner.scriptengine.jshell.PrivateClass beta = alpha");
+        }).isInstanceOf(ScriptException.class);
     }
 
     @Test
@@ -188,14 +190,16 @@ public class JShellScriptEngineTest {
         assertThat(engine.get("beta")).isSameAs(privateClass);
     }
 
-    @Test(expected = ScriptException.class)
+    @Test
     public void testBindingsProtectedClassFail() throws ScriptException {
         ScriptEngineManager manager = new ScriptEngineManager();
         ScriptEngine engine = manager.getEngineByName("jshell");
         PrivateClass privateClass = new PrivateClass();
         engine.put("alpha", privateClass);
 
-        Object result = engine.eval("ch.obermuhlner.scriptengine.jshell.ProtectedClass beta = alpha");
+        assertThatThrownBy(() -> {
+            Object result = engine.eval("ch.obermuhlner.scriptengine.jshell.ProtectedClass beta = alpha");
+        }).isInstanceOf(ScriptException.class);
     }
 
     @Test
@@ -210,13 +214,15 @@ public class JShellScriptEngineTest {
         assertThat(engine.get("beta")).isSameAs(protectedClass);
     }
 
-    @Test(expected = ScriptException.class)
+    @Test
     public void testBindingsIllegalVariable() throws ScriptException {
         ScriptEngineManager manager = new ScriptEngineManager();
         ScriptEngine engine = manager.getEngineByName("jshell");
         engine.put("illegal with spaces", 2);
 
-        Object result = engine.eval("var message = alpha.message");
+        assertThatThrownBy(() -> {
+            Object result = engine.eval("var message = alpha.message");
+        }).isInstanceOf(ScriptException.class);
     }
 
     @Test
@@ -267,6 +273,30 @@ public class JShellScriptEngineTest {
         assertThatThrownBy(() -> {
             engine.setContext(null);
         }).isInstanceOf(NullPointerException.class);
+    }
+
+    @Test
+    public void testCreateBindings() throws ScriptException {
+        ScriptEngineManager manager = new ScriptEngineManager();
+        ScriptEngine engine = manager.getEngineByName("jshell");
+
+        assertThat(engine.createBindings()).isNotNull();
+    }
+
+    @Test
+    public void testSetBindings() throws ScriptException {
+        ScriptEngineManager manager = new ScriptEngineManager();
+        ScriptEngine engine = manager.getEngineByName("jshell");
+
+        engine.setBindings(null, ScriptContext.GLOBAL_SCOPE);
+
+        assertThatThrownBy(() -> {
+            engine.setBindings(null, ScriptContext.ENGINE_SCOPE);
+        }).isInstanceOf(NullPointerException.class);
+
+        assertThatThrownBy(() -> {
+            engine.setBindings(new SimpleBindings(), -999);
+        }).isInstanceOf(IllegalArgumentException.class);
     }
 
     @Test
