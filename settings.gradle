@@ -1,4 +1,5 @@
 
+include 'ch.obermuhlner.scriptengine'
 include 'ch.obermuhlner.scriptengine.jshell'
 include 'ch.obermuhlner.scriptengine.example'
 
