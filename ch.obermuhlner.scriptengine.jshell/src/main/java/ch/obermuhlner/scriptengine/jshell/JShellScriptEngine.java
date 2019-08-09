@@ -11,6 +11,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.Reader;
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -167,13 +168,32 @@ public class JShellScriptEngine implements ScriptEngine {
             return Object.class.getCanonicalName();
         }
 
-        String type = value.getClass().getCanonicalName();
-
-        if (type == null) {
-            type = Object.class.getCanonicalName();
+        Class<?> clazz = value.getClass();
+        while (clazz != null) {
+            if(isValidType(clazz)) {
+                return clazz.getCanonicalName();
+            }
+            for(Class<?> interfaceClazz : clazz.getInterfaces()) {
+                if(isValidType(interfaceClazz)) {
+                    return interfaceClazz.getCanonicalName();
+                }
+            }
+            clazz = clazz.getSuperclass();
         }
 
-        return type;
+        return Object.class.getCanonicalName();
+    }
+
+    private boolean isValidType(Class<?> clazz) {
+        if(clazz.getCanonicalName() == null) {
+            return false;
+        }
+
+        if((clazz.getModifiers() & (Modifier.PRIVATE | Modifier.PROTECTED)) != 0) {
+            return false;
+        }
+
+        return true;
     }
 
     public static Object getVariableValue(String name) {

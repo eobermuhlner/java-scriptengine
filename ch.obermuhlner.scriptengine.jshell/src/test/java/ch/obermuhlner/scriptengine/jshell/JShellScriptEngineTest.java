@@ -5,6 +5,9 @@ import org.junit.Test;
 
 import javax.script.*;
 
+import java.io.Reader;
+import java.io.StringReader;
+
 import static org.junit.Assert.*;
 
 public class JShellScriptEngineTest {
@@ -151,18 +154,100 @@ public class JShellScriptEngineTest {
         assertEquals("hello", engine.get("message"));
     }
 
-    @Test
-    public void testBindingsPrivateClass() throws ScriptException {
+    @Test(expected = ScriptException.class)
+    public void testBindingsPrivateClassFail() throws ScriptException {
         ScriptEngineManager manager = new ScriptEngineManager();
         ScriptEngine engine = manager.getEngineByName("jshell");
-        PublicClass publicClass = new PublicClass();
-        publicClass.message = "hello";
-        engine.put("alpha", publicClass);
+        PrivateClass privateClass = new PrivateClass();
+        engine.put("alpha", privateClass);
+
+        Object result = engine.eval("ch.obermuhlner.scriptengine.jshell.PrivateClass beta = alpha");
+    }
+
+    @Test
+    public void testBindingsPrivateClassAsObject() throws ScriptException {
+        ScriptEngineManager manager = new ScriptEngineManager();
+        ScriptEngine engine = manager.getEngineByName("jshell");
+        PrivateClass privateClass = new PrivateClass();
+        engine.put("alpha", privateClass);
+
+        Object result = engine.eval("Object beta = alpha");
+        assertSame(privateClass, engine.get("alpha"));
+        assertSame(privateClass, engine.get("beta"));
+    }
+
+    @Test(expected = ScriptException.class)
+    public void testBindingsProtectedClassFail() throws ScriptException {
+        ScriptEngineManager manager = new ScriptEngineManager();
+        ScriptEngine engine = manager.getEngineByName("jshell");
+        PrivateClass privateClass = new PrivateClass();
+        engine.put("alpha", privateClass);
+
+        Object result = engine.eval("ch.obermuhlner.scriptengine.jshell.ProtectedClass beta = alpha");
+    }
+
+    @Test
+    public void testBindingsProtectedClassAsObject() throws ScriptException {
+        ScriptEngineManager manager = new ScriptEngineManager();
+        ScriptEngine engine = manager.getEngineByName("jshell");
+        ProtectedClass protectedClass = new ProtectedClass();
+        engine.put("alpha", protectedClass);
+
+        Object result = engine.eval("Object beta = alpha");
+        assertSame(protectedClass, engine.get("alpha"));
+        assertSame(protectedClass, engine.get("beta"));
+    }
+
+    @Test(expected = ScriptException.class)
+    public void testBindingsIllegalVariable() throws ScriptException {
+        ScriptEngineManager manager = new ScriptEngineManager();
+        ScriptEngine engine = manager.getEngineByName("jshell");
+        engine.put("illegal with spaces", 2);
 
         Object result = engine.eval("var message = alpha.message");
-        assertEquals("hello", result);
-        assertSame(publicClass, engine.get("alpha"));
-        assertEquals("hello", engine.get("message"));
+    }
+
+    @Test
+    public void testEvalReader() throws ScriptException {
+        ScriptEngineManager manager = new ScriptEngineManager();
+        ScriptEngine engine = manager.getEngineByName("jshell");
+
+        Reader reader = new StringReader("1234");
+        Object result = engine.eval(reader);
+        assertEquals(1234, result);
+    }
+
+    @Test
+    public void testEvalReaderContext() throws ScriptException {
+        ScriptEngineManager manager = new ScriptEngineManager();
+        ScriptEngine engine = manager.getEngineByName("jshell");
+
+        ScriptContext context = new SimpleScriptContext();
+        context.getBindings(ScriptContext.ENGINE_SCOPE).put("alpha", 1000);
+        Reader reader = new StringReader("alpha+999");
+        Object result = engine.eval(reader, context);
+        assertEquals(1999, result);
+    }
+
+    @Test
+    public void testEvalReaderBindings() throws ScriptException {
+        ScriptEngineManager manager = new ScriptEngineManager();
+        ScriptEngine engine = manager.getEngineByName("jshell");
+
+        SimpleBindings bindings = new SimpleBindings();
+        bindings.put("alpha", 1000);
+        Reader reader = new StringReader("alpha+321");
+        Object result = engine.eval(reader, bindings);
+        assertEquals(1321, result);
+    }
+
+    @Test
+    public void testGetFactory() throws ScriptException {
+        ScriptEngineManager manager = new ScriptEngineManager();
+        ScriptEngine engine = manager.getEngineByName("jshell");
+
+        ScriptEngineFactory factory = engine.getFactory();
+        assertSame(JShellScriptEngineFactory.class, factory.getClass());
     }
 
     private void assertScript(String script, Object expectedResult) throws ScriptException {
@@ -189,6 +274,8 @@ public class JShellScriptEngineTest {
     }
 
     private static class PrivateClass {
-        public String message;
+    }
+
+    protected static class ProtectedClass {
     }
 }
