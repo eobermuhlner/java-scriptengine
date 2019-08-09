@@ -38,7 +38,7 @@ public class JShellScriptEngineFactory implements ScriptEngineFactory {
 
     @Override
     public String getLanguageVersion() {
-        return "9";
+        return System.getProperty("java.version");
     }
 
     @Override

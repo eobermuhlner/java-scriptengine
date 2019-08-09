@@ -30,7 +30,7 @@ public class JShellScriptEngineFactoryTest {
     @Test
     public void testGetLanguageVersion() {
         JShellScriptEngineFactory factory = new JShellScriptEngineFactory();
-        assertThat(factory.getLanguageVersion()).isEqualTo("9");
+        assertThat(factory.getLanguageVersion()).isEqualTo(System.getProperty("java.version"));
     }
 
     @Test
