@@ -37,14 +37,14 @@ public class JShellScriptEngineTest {
     public void testFailUnknownVariable() {
         assertThatThrownBy(() -> {
             assertScript("unknown", null);
-        }).isInstanceOf(ScriptException.class);
+        }).isInstanceOf(ScriptException.class).hasMessageContaining("unknown");
     }
 
     @Test
     public void testFailIncompleteScript() {
         assertThatThrownBy(() -> {
             assertScript("foo(", null);
-        }).isInstanceOf(ScriptException.class);
+        }).isInstanceOf(ScriptException.class).hasMessageContaining("Incomplete");
     }
 
     @Test
@@ -54,14 +54,14 @@ public class JShellScriptEngineTest {
                     "var alpha = 0;" +
                     "var alpha = 1;",
                     null);
-        }).isInstanceOf(ScriptException.class);
+        }).isInstanceOf(ScriptException.class).hasMessageContaining("alpha");
     }
 
     @Test
     public void testFailEvalDivByZero() {
         assertThatThrownBy(() -> {
             assertScript("1/0", null);
-        }).isInstanceOf(ScriptException.class);
+        }).isInstanceOf(ScriptException.class).hasMessageContaining("ArithmeticException");
     }
 
     @Test
@@ -71,7 +71,7 @@ public class JShellScriptEngineTest {
                     "Object foo = null;" +
                     "foo.toString()",
                     null);
-        }).isInstanceOf(ScriptException.class);
+        }).isInstanceOf(ScriptException.class).hasMessageContaining("NullPointerException");
     }
 
     @Test
@@ -175,7 +175,7 @@ public class JShellScriptEngineTest {
 
         assertThatThrownBy(() -> {
             Object result = engine.eval("ch.obermuhlner.scriptengine.jshell.PrivateClass beta = alpha");
-        }).isInstanceOf(ScriptException.class);
+        }).isInstanceOf(ScriptException.class).hasMessageContaining("PrivateClass");
     }
 
     @Test
@@ -199,7 +199,7 @@ public class JShellScriptEngineTest {
 
         assertThatThrownBy(() -> {
             Object result = engine.eval("ch.obermuhlner.scriptengine.jshell.ProtectedClass beta = alpha");
-        }).isInstanceOf(ScriptException.class);
+        }).isInstanceOf(ScriptException.class).hasMessageContaining("ProtectedClass");
     }
 
     @Test
@@ -215,14 +215,22 @@ public class JShellScriptEngineTest {
     }
 
     @Test
-    public void testBindingsIllegalVariable() throws ScriptException {
+    public void testBindingsPutIllegalVariable() throws ScriptException {
         ScriptEngineManager manager = new ScriptEngineManager();
         ScriptEngine engine = manager.getEngineByName("jshell");
-        engine.put("illegal with spaces", 2);
 
         assertThatThrownBy(() -> {
+            engine.put("illegal with spaces", 2);
             Object result = engine.eval("var message = alpha.message");
         }).isInstanceOf(ScriptException.class);
+    }
+
+    @Test
+    public void testBindingsGetIllegalVariable() throws ScriptException {
+        ScriptEngineManager manager = new ScriptEngineManager();
+        ScriptEngine engine = manager.getEngineByName("jshell");
+
+        assertThat(engine.get("illegal with spaces")).isNull();
     }
 
     @Test
