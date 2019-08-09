@@ -1,5 +1,6 @@
-package ch.obermuhlner.scriptengine;
+package ch.obermuhlner.scriptengine.builder;
 
+import ch.obermuhlner.scriptengine.builder.ScriptEngineBuilder;
 import org.junit.Test;
 
 public class ScriptEngineBuilderTest {

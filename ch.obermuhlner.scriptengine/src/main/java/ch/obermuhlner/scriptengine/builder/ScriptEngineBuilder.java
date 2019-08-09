@@ -1,4 +1,4 @@
-package ch.obermuhlner.scriptengine;
+package ch.obermuhlner.scriptengine.builder;
 
 import javax.script.*;
 import java.io.Reader;
@@ -150,6 +150,10 @@ public class ScriptEngineBuilder {
         return this;
     }
 
+    public ScriptEngine engine() {
+        return engine;
+    }
+
     public static class ScriptEngineBuilderWithResult extends ScriptEngineBuilder {
         private final Object result;
         private final ScriptException exception;
@@ -183,6 +187,10 @@ public class ScriptEngineBuilder {
                 engineExceptionConsumer.accept(engine, exception);
             }
             return this;
+        }
+
+        public Object result() {
+            return result;
         }
     }
 }
