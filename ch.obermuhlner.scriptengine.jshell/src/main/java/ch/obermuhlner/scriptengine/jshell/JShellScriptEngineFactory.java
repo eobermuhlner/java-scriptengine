@@ -13,7 +13,7 @@ public class JShellScriptEngineFactory implements ScriptEngineFactory {
 
     @Override
     public String getEngineVersion() {
-        return "0.1";
+        return "0.1.0";
     }
 
     @Override
@@ -28,7 +28,7 @@ public class JShellScriptEngineFactory implements ScriptEngineFactory {
 
     @Override
     public List<String> getNames() {
-        return Arrays.asList("JShell", "jshell", "obermuhlner-jshell");
+        return Arrays.asList("JShell", "jshell", "ch.obermuhlner:scriptengine-jshell", "obermuhlner-jshell");
     }
 
     @Override
@@ -71,7 +71,7 @@ public class JShellScriptEngineFactory implements ScriptEngineFactory {
             }
             s.append(args[i]);
         }
-        s.append(");");
+        s.append(")");
         return s.toString();
     }
 
