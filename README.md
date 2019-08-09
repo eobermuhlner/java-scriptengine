@@ -1,7 +1,8 @@
 [![Build Status](https://badgen.net/travis/eobermuhlner/java-scriptengine)](https://travis-ci.org/eobermuhlner/java-scriptengine)
 [![Code Coverage](https://badgen.net/codecov/c/github/eobermuhlner/java-scriptengine)](https://codecov.io/gh/eobermuhlner/java-scriptengine)
 [![Open Issues](https://badgen.net/github/open-issues/eobermuhlner/java-scriptengine)](https://github.com/eobermuhlner/java-scriptengine/issues)
-[![Closed Issues](https://badgen.net/github/closed-issues/eobermuhlner/java-scriptengine)](https://github.com/eobermuhlner/java-scriptengine/issues)
+[![Commits](https://badgen.net/github/commits/eobermuhlner/java-scriptengine)](https://github.com/eobermuhlner/java-scriptengine/graphs/commit-activity)
+[![Last Commits](https://badgen.net/github/last-commit/eobermuhlner/java-scriptengine)](https://github.com/eobermuhlner/java-scriptengine/graphs/commit-activity)
 
 
 A collection of JSR-223 compatible script engines for Java.
