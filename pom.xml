@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>ch.obermuhlner</groupId>
+  <artifactId>scriptengine-jshell</artifactId>
+  <version>0.1.0</version>
+  <name>JShell ScriptEngine</name>
+  <description>Grid form for JavaFX.</description>
+  <url>https://github.com/eobermuhlner/java-scriptengine</url>
+  <licenses>
+    <license>
+      <name>MIT License</name>
+      <url>https://raw.githubusercontent.com/eobermuhlner/java-scriptengine/master/LICENSE.txt</url>
+    </license>
+  </licenses>
+  <developers>
+    <developer>
+      <id>eobermuhlner</id>
+      <name>Eric Obermuhlner</name>
+      <email>eobermuhlner@gmail.com</email>
+    </developer>
+  </developers>
+  <scm>
+    <connection>scm:git:git://github.com/java-scriptengine.git</connection>
+    <developerConnection>scm:ssh://github.com:eobermuhlner/java-scriptengine.git</developerConnection>
+    <url>https://github.com/eobermuhlner/java-scriptengine/</url>
+  </scm>
+  <dependencies>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>4.12</version>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
+</project>
