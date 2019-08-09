@@ -160,7 +160,9 @@ public class JShellScriptEngineTest {
         publicClass.message = "hello";
         engine.put("alpha", publicClass);
 
-        Object result = engine.eval("var message = alpha.message");
+        Object result = engine.eval("" +
+                "ch.obermuhlner.scriptengine.jshell.JShellScriptEngineTest.PublicClass beta = alpha;" +
+                "var message = alpha.message");
         assertThat(result).isEqualTo("hello");
         assertThat(engine.get("alpha")).isSameAs(publicClass);
         assertThat(engine.get("message")).isEqualTo("hello");
@@ -174,7 +176,7 @@ public class JShellScriptEngineTest {
         engine.put("alpha", privateClass);
 
         assertThatThrownBy(() -> {
-            Object result = engine.eval("ch.obermuhlner.scriptengine.jshell.PrivateClass beta = alpha");
+            Object result = engine.eval("ch.obermuhlner.scriptengine.jshell.JShellScriptEngineTest.PrivateClass beta = alpha");
         }).isInstanceOf(ScriptException.class).hasMessageContaining("PrivateClass");
     }
 
@@ -191,14 +193,14 @@ public class JShellScriptEngineTest {
     }
 
     @Test
-    public void testBindingsProtectedClassFail() throws ScriptException {
+    public void testBindingsProtectedClassFail() {
         ScriptEngineManager manager = new ScriptEngineManager();
         ScriptEngine engine = manager.getEngineByName("jshell");
-        PrivateClass privateClass = new PrivateClass();
-        engine.put("alpha", privateClass);
+        ProtectedClass protectedClass = new ProtectedClass();
+        engine.put("alpha", protectedClass);
 
         assertThatThrownBy(() -> {
-            Object result = engine.eval("ch.obermuhlner.scriptengine.jshell.ProtectedClass beta = alpha");
+            Object result = engine.eval("ch.obermuhlner.scriptengine.jshell.JShellScriptEngineTest.ProtectedClass beta = alpha");
         }).isInstanceOf(ScriptException.class).hasMessageContaining("ProtectedClass");
     }
 
@@ -212,6 +214,46 @@ public class JShellScriptEngineTest {
         Object result = engine.eval("Object beta = alpha");
         assertThat(engine.get("alpha")).isSameAs(protectedClass);
         assertThat(engine.get("beta")).isSameAs(protectedClass);
+    }
+
+    @Test
+    public void testBindingsPrivateClassAsInterface() throws ScriptException {
+        ScriptEngineManager manager = new ScriptEngineManager();
+        ScriptEngine engine = manager.getEngineByName("jshell");
+        PrivateClassWithMyInterface privateClassWithMyInterface = new PrivateClassWithMyInterface();
+        engine.put("alpha", privateClassWithMyInterface);
+
+        Object result = engine.eval("" +
+                "ch.obermuhlner.scriptengine.jshell.JShellScriptEngineTest.MyInterface beta = alpha;" +
+                "alpha.getMessage()");
+        assertThat(result).isEqualTo("my message");
+        assertThat(engine.get("alpha")).isSameAs(privateClassWithMyInterface);
+        assertThat(engine.get("beta")).isSameAs(privateClassWithMyInterface);
+    }
+
+    @Test
+    public void testBindingsNullAsObject() throws ScriptException {
+        ScriptEngineManager manager = new ScriptEngineManager();
+        ScriptEngine engine = manager.getEngineByName("jshell");
+        engine.put("alpha", null);
+
+        Object result = engine.eval("Object beta = alpha");
+        assertThat(engine.get("alpha")).isNull();
+        assertThat(engine.get("beta")).isNull();
+    }
+
+    @Test
+    public void testBindingsAnonymousClassAsObject() throws ScriptException {
+        ScriptEngineManager manager = new ScriptEngineManager();
+        ScriptEngine engine = manager.getEngineByName("jshell");
+        Object anonymous = new Object() {
+        };
+        System.out.println(anonymous.getClass().getCanonicalName());
+        engine.put("alpha", anonymous);
+
+        Object result = engine.eval("Object beta = alpha");
+        assertThat(engine.get("alpha")).isSameAs(anonymous);
+        assertThat(engine.get("beta")).isSameAs(anonymous);
     }
 
     @Test
@@ -328,6 +370,15 @@ public class JShellScriptEngineTest {
     }
 
     private static class PrivateClass {
+    }
+
+    public interface MyInterface {
+        default String getMessage() {
+            return "my message";
+        }
+    }
+
+    private static class PrivateClassWithMyInterface implements MyInterface {
     }
 
     protected static class ProtectedClass {
