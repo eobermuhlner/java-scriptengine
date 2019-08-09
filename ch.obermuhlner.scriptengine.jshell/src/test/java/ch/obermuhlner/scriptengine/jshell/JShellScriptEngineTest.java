@@ -242,6 +242,26 @@ public class JShellScriptEngineTest {
     }
 
     @Test
+    public void testSetGetContext() throws ScriptException {
+        ScriptEngineManager manager = new ScriptEngineManager();
+        ScriptEngine engine = manager.getEngineByName("jshell");
+
+        assertNotNull(engine.getContext());
+
+        SimpleScriptContext context = new SimpleScriptContext();
+        engine.setContext(context);
+        assertSame(context, engine.getContext());
+    }
+
+    @Test(expected = NullPointerException.class)
+    public void testSetContextFail() throws ScriptException {
+        ScriptEngineManager manager = new ScriptEngineManager();
+        ScriptEngine engine = manager.getEngineByName("jshell");
+
+        engine.setContext(null);
+    }
+
+    @Test
     public void testGetFactory() throws ScriptException {
         ScriptEngineManager manager = new ScriptEngineManager();
         ScriptEngine engine = manager.getEngineByName("jshell");

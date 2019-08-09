@@ -32,6 +32,7 @@ public class JShellScriptEngine implements ScriptEngine {
 
     @Override
     public void setContext(ScriptContext context) {
+        Objects.requireNonNull(context);
         this.context = context;
     }
 
