@@ -1,14 +1,14 @@
-package ch.obermuhlner.scriptengine.jshell;
+package ch.obermuhlner.scriptengine.spring.expression;
 
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineFactory;
 import java.util.Arrays;
 import java.util.List;
 
-public class JShellScriptEngineFactory implements ScriptEngineFactory {
+public class SpringExpressionScriptEngineFactory implements ScriptEngineFactory {
     @Override
     public String getEngineName() {
-        return "JShell ScriptEngine";
+        return "Spring Expression Language";
     }
 
     @Override
@@ -18,27 +18,27 @@ public class JShellScriptEngineFactory implements ScriptEngineFactory {
 
     @Override
     public List<String> getExtensions() {
-        return Arrays.asList("jsh", "jshell");
+        return Arrays.asList("spel");
     }
 
     @Override
     public List<String> getMimeTypes() {
-        return Arrays.asList("text/x-jshell-source");
+        return Arrays.asList("text/x-spel-source");
     }
 
     @Override
     public List<String> getNames() {
-        return Arrays.asList("JShell", "jshell", "ch.obermuhlner:jshell-scriptengine", "obermuhlner-jshell");
+        return Arrays.asList("spel", "SpEL", "SpringExpression", "ch.obermuhlner:spel-scriptengine", "obermuhlner-spel");
     }
 
     @Override
     public String getLanguageName() {
-        return "JShell";
+        return "Spring Expression Language";
     }
 
     @Override
     public String getLanguageVersion() {
-        return System.getProperty("java.version");
+        return "5.1.9";
     }
 
     @Override
@@ -77,7 +77,7 @@ public class JShellScriptEngineFactory implements ScriptEngineFactory {
 
     @Override
     public String getOutputStatement(String toDisplay) {
-        return "System.out.println(" + toDisplay + ")";
+        throw new UnsupportedOperationException();
     }
 
     @Override
@@ -92,6 +92,6 @@ public class JShellScriptEngineFactory implements ScriptEngineFactory {
 
     @Override
     public ScriptEngine getScriptEngine() {
-        return new JShellScriptEngine();
+        return new SpringExpressionScriptEngine();
     }
 }
