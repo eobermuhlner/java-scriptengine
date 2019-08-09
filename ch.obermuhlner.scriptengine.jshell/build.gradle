@@ -87,7 +87,7 @@ uploadArchives {
 	            name 'JShell ScriptEngine'
 	            packaging 'jar'
 	            // optionally artifactId can be defined here
-	            description 'Grid form for JavaFX.'
+	            description 'Java script engine for JShell.'
 	            url 'https://github.com/eobermuhlner/java-scriptengine'
 
 	            scm {

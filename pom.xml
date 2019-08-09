@@ -6,7 +6,7 @@
   <artifactId>scriptengine-jshell</artifactId>
   <version>0.1.0</version>
   <name>JShell ScriptEngine</name>
-  <description>Grid form for JavaFX.</description>
+  <description>Java script engine for JShell.</description>
   <url>https://github.com/eobermuhlner/java-scriptengine</url>
   <licenses>
     <license>
