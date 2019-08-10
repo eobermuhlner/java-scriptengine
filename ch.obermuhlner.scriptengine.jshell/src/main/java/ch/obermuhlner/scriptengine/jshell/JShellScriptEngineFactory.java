@@ -28,7 +28,7 @@ public class JShellScriptEngineFactory implements ScriptEngineFactory {
 
     @Override
     public List<String> getNames() {
-        return Arrays.asList("JShell", "jshell", "ch.obermuhlner:jshell-scriptengine", "obermuhlner-jshell");
+        return Arrays.asList("JShell", "jshell", "ch.obermuhlner:scriptengine-jshell", "obermuhlner-jshell");
     }
 
     @Override
