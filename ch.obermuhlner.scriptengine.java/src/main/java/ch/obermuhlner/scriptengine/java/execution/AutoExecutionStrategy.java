@@ -41,13 +41,14 @@ public class AutoExecutionStrategy implements ExecutionStrategy {
             }
         }
 
-        throw new ScriptException("Cannot execute instance of type: " + instance.getClass());
+        throw new ScriptException("No method found to execute instance of type: " + instance.getClass());
     }
 
     private static Method findCallableMethod(Class<?> clazz) {
         List<Method> callableMethods = new ArrayList<>();
         for (Method method : clazz.getDeclaredMethods()) {
-            if (method.getParameterCount() == 0 && (method.getModifiers() & Modifier.PUBLIC) != 0) {
+            int modifiers = method.getModifiers();
+            if (method.getParameterCount() == 0 && Modifier.isPublic(modifiers) && !Modifier.isStatic(modifiers)) {
                 callableMethods.add(method);
             }
         }

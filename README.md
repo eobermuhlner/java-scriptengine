@@ -20,7 +20,6 @@ production environment.
 Known issues:
 * Java script class must be called `Script`
 * Script is compiled into a `Script.class` file in the current directory
-* Variable bindings are not yet implemented
 
 ## Simple usage
 
@@ -86,3 +85,60 @@ Result1: Hello World #1
 Result2: Hello World #2
 ```
 
+## Bindings instance variables (fields) 
+
+You can read and write instance variables (fields) by using `Bindings` in the script engine.
+
+In the `ScriptEngine` API the instance variables are
+in the scope `ScriptContext.ENGINE_SCOPE` which you can
+pass as argument in the `eval()` method.
+
+```java
+try {
+    ScriptEngineManager manager = new ScriptEngineManager();
+    ScriptEngine engine = manager.getEngineByName("java");
+    Compilable compiler = (Compilable) engine;
+
+    CompiledScript compiledScript = compiler.compile("" +
+            "public class Script {" +
+            "   public String message = \"Counting\";" +
+            "   public int counter = 1;" +
+            "   public String getMessage() {" +
+            "       return message + \" #\" + counter++;" +
+            "   } " +
+            "}");
+
+    {
+        Bindings bindings = engine.createBindings();
+
+        Object result = compiledScript.eval(bindings);
+
+        System.out.println("Result1: " + result);
+        System.out.println("Variable1 message: " + bindings.get("message"));
+        System.out.println("Variable1 counter: " + bindings.get("counter"));
+    }
+
+    {
+        Bindings bindings = engine.createBindings();
+        bindings.put("message", "Hello world");
+
+        Object result = compiledScript.eval(bindings);
+
+        System.out.println("Result2: " + result);
+        System.out.println("Variable2 message: " + bindings.get("message"));
+        System.out.println("Variable2 counter: " + bindings.get("counter"));
+    }
+} catch (ScriptException e) {
+    e.printStackTrace();
+}
+```
+
+The console output shows that bindings can read and write values. 
+```console
+Result1: Counting #1
+Variable1 message: Counting
+Variable1 counter: 2
+Result2: Hello world #2
+Variable2 message: Hello world
+Variable2 counter: 3
+```
