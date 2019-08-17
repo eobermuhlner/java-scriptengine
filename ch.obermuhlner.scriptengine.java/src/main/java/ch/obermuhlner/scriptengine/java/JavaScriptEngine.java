@@ -1,5 +1,9 @@
 package ch.obermuhlner.scriptengine.java;
 
+import ch.obermuhlner.scriptengine.java.constructor.ConstructorStrategy;
+import ch.obermuhlner.scriptengine.java.constructor.DefaultConstructorStrategy;
+import ch.obermuhlner.scriptengine.java.execution.AutoExecutionStrategy;
+import ch.obermuhlner.scriptengine.java.execution.ExecutionStrategy;
 import jdk.jshell.*;
 import jdk.jshell.execution.DirectExecutionControl;
 import jdk.jshell.spi.ExecutionControl;
@@ -17,12 +21,24 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.nio.file.Path;
 import java.util.*;
+import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 public class JavaScriptEngine implements ScriptEngine, Compilable {
 
+    private ConstructorStrategy constructorStrategy = new DefaultConstructorStrategy();
+    private Function<Class<?>, ExecutionStrategy> executionStrategyFunction = (clazz) -> new AutoExecutionStrategy(clazz);
+
     private ScriptContext context = new SimpleScriptContext();
+
+    public void setConstructorStrategy(ConstructorStrategy constructorStrategy) {
+        this.constructorStrategy = constructorStrategy;
+    }
+
+    public void setExecutionStrategyFunction(Function<Class<?>, ExecutionStrategy> executionStrategyFunction) {
+        this.executionStrategyFunction = executionStrategyFunction;
+    }
 
     @Override
     public ScriptContext getContext() {
@@ -120,9 +136,10 @@ public class JavaScriptEngine implements ScriptEngine, Compilable {
         DynamicClassLoader classLoader = new DynamicClassLoader(fullClassName, Path.of(fileName), JavaScriptEngine.class.getClassLoader());
         try {
             Class<?> clazz = classLoader.loadClass(fullClassName);
-            Object instance = clazz.getDeclaredConstructor().newInstance();
-            return new JavaCompiledScript(this, instance);
-        } catch (ClassNotFoundException | InstantiationException | InvocationTargetException | NoSuchMethodException | IllegalAccessException e) {
+            Object instance = constructorStrategy.construct(clazz);
+            ExecutionStrategy executionStrategy = executionStrategyFunction.apply(clazz);
+            return new JavaCompiledScript(this, instance, executionStrategy);
+        } catch (ClassNotFoundException e) {
             throw new ScriptException(e);
         }
     }
