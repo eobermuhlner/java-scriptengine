@@ -1,6 +1,4 @@
 
-include 'ch.obermuhlner.scriptengine'
 include 'ch.obermuhlner.scriptengine.example'
-include 'ch.obermuhlner.scriptengine.jshell'
-include 'ch.obermuhlner.scriptengine.spring.expression'
+include 'ch.obermuhlner.scriptengine.java'
 

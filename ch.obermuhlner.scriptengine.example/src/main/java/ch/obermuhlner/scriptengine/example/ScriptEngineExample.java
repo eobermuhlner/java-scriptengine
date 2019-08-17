@@ -1,150 +1,56 @@
 package ch.obermuhlner.scriptengine.example;
 
-import ch.obermuhlner.scriptengine.spring.expression.SpringExpressionScriptEngine;
-
-import javax.script.ScriptEngine;
-import javax.script.ScriptEngineManager;
-import javax.script.ScriptException;
+import javax.script.*;
 
 public class ScriptEngineExample {
     public static void main(String[] args) {
-        //runNashornExamples();
-        //runJShellExamples();
-        runSpringExpressionExamples();
+        runExamples();
     }
 
-    private static void runNashornExamples() {
-        runExample("nashorn", "2+3");
+    private static void runExamples() {
+        runHelloWorldExample();
+        runCompileHelloWorldExample();
     }
 
-    private static void runJShellExamples() {
-        runExample("jshell", "2+3");
-
-        runJShellBindingExample();
-        runJShellVisibleClassesExample();
-        runJShellErrorExample();
-    }
-
-    private static void runSpringExpressionExamples() {
-        runExample("spel", "2+3");
-
-        runSpelBindingExample();
-        runSpelRootBindingExample();
-    }
-
-    private static void runExample(String engineName, String script) {
+    private static void runHelloWorldExample() {
         try {
-            System.out.println("Engine: " + engineName);
             ScriptEngineManager manager = new ScriptEngineManager();
-            ScriptEngine engine = manager.getEngineByName(engineName);
-            Object result = engine.eval(script);
+            ScriptEngine engine = manager.getEngineByName("java");
+
+            Object result = engine.eval("" +
+                    "public class Script {" +
+                    "   public String getMessage() {" +
+                    "       return \"Hello World\";" +
+                    "   } " +
+                    "}");
             System.out.println("Result: " + result);
         } catch (ScriptException e) {
             e.printStackTrace();
         }
     }
 
-    private static void runJShellBindingExample() {
+    private static void runCompileHelloWorldExample() {
         try {
             ScriptEngineManager manager = new ScriptEngineManager();
-            ScriptEngine engine = manager.getEngineByName("jshell");
+            ScriptEngine engine = manager.getEngineByName("java");
+            Compilable compiler = (Compilable) engine;
 
-            String script = "" +
-                    "System.out.println(\"Input A: \" + inputA);" +
-                    "System.out.println(\"Input B: \" + inputB);" +
-                    "var output = inputA + inputB;" +
-                    "1000 + output;";
+            CompiledScript compiledScript = compiler.compile("" +
+                    "public class Script {" +
+                    "   private int counter = 1;" +
+                    "   public String getMessage() {" +
+                    "       return \"Hello World #\" + counter++;" +
+                    "   } " +
+                    "}");
 
-            engine.put("inputA", 2);
-            engine.put("inputB", 3);
+            Object result1 = compiledScript.eval();
+            System.out.println("Result1: " + result1);
 
-            Object result = engine.eval(script);
-            System.out.println("Result: " + result);
-
-            Object output = engine.get("output");
-            System.out.println("Output Variable: " + output);
-
+            Object result2 = compiledScript.eval();
+            System.out.println("Result2: " + result2);
         } catch (ScriptException e) {
             e.printStackTrace();
         }
     }
 
-    private static void runJShellVisibleClassesExample() {
-        try {
-            ScriptEngineManager manager = new ScriptEngineManager();
-            ScriptEngine engine = manager.getEngineByName("jshell");
-
-            String script = "" +
-                    "import ch.obermuhlner.scriptengine.example.Person;" +
-                    "var person = new Person();" +
-                    "person.name = \"Eric\";" +
-                    "person.birthYear = 1967;";
-
-            Object result = engine.eval(script);
-            System.out.println("Result: " + result);
-
-            Object person = engine.get("person");
-            System.out.println("Person Variable: " + person);
-        } catch (ScriptException e) {
-            e.printStackTrace();
-        }
-    }
-
-    private static void runJShellErrorExample() {
-        try {
-            ScriptEngineManager manager = new ScriptEngineManager();
-            ScriptEngine engine = manager.getEngineByName("jshell");
-
-            String script = "" +
-                    "System.out.println(unknown);" +
-                    "var message = \"Should never reach this point\"";
-
-            Object result = engine.eval(script);
-            System.out.println("Result: " + result);
-        } catch (ScriptException e) {
-            e.printStackTrace();
-        }
-    }
-
-    private static void runSpelBindingExample() {
-        try {
-            ScriptEngineManager manager = new ScriptEngineManager();
-            ScriptEngine engine = manager.getEngineByName("spel");
-
-            engine.put("inputA", 2);
-            engine.put("inputB", 3);
-            engine.put("output", 0);
-
-            String script = "" +
-                    "#output = #inputA + #inputB";
-
-            Object result = engine.eval(script);
-            System.out.println("Result: " + result);
-
-            Object output = engine.get("output");
-            System.out.println("Output Variable: " + output);
-        } catch (ScriptException e) {
-            e.printStackTrace();
-        }
-    }
-
-    private static void runSpelRootBindingExample() {
-        try {
-            ScriptEngineManager manager = new ScriptEngineManager();
-            ScriptEngine engine = manager.getEngineByName("spel");
-
-            Person person = new Person();
-            person.name = "Eric";
-            person.birthYear = 1967;
-            engine.put(SpringExpressionScriptEngine.ROOT, person);
-
-            String script = "" +
-                    "name+birthYear";
-
-            Object result = engine.eval(script);
-            System.out.println("Result: " + result);
-        } catch (ScriptException e) {
-            e.printStackTrace();
-        }
-    }
 }
