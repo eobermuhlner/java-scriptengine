@@ -10,6 +10,18 @@
 The `java-scriptengine` (not to be confused with a `javascript` script engine)
 compiles and executes `Java` files at runtime.
 
+# Project State
+
+This project is NOT YET PRODUCTION READY!
+
+Several issues must be solved before this project can be used in a 
+production environment.
+
+Known issues:
+* Java script class must be called `Script`
+* Script is compiled into a `Script.class` file in the current directory
+* Variable bindings are not yet implemented
+
 ## Simple usage
 
 The following code snippet shows a simple usage of the Java script engine:
