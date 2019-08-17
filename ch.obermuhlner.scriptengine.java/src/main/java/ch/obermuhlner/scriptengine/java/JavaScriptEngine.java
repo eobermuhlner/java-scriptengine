@@ -146,44 +146,4 @@ public class JavaScriptEngine implements ScriptEngine, Compilable {
             throw new ScriptException(e);
         }
     }
-
-    public static void main(String[] args) {
-        JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
-        final DiagnosticCollector<JavaFileObject> diagnostics = new DiagnosticCollector<>();
-        StandardJavaFileManager fileManager = compiler.getStandardFileManager(diagnostics, null, null);
-
-        JavaStringObject testSource = new JavaStringObject("Test", "" +
-                "package example;" +
-                "public class Test implements java.util.function.Supplier<String> {" +
-                "   public String get() {" +
-                "       return \"Hello\";" +
-                "   } " +
-                "}");
-
-        JavaCompiler.CompilationTask task = compiler.getTask(null, fileManager, diagnostics, null, null, Arrays.asList(testSource));
-        if (!task.call()) {
-            diagnostics.getDiagnostics().forEach(System.out::println);
-        }
-
-        DynamicClassLoader classLoader = new DynamicClassLoader("example.Test", Path.of("Test.class"), JavaScriptEngine.class.getClassLoader());
-        try {
-            Class<?> clazz = classLoader.loadClass("example.Test");
-            Object testInstance = clazz.getDeclaredConstructor().newInstance();
-            if (testInstance instanceof Supplier) {
-                Supplier testSupplier = (Supplier) testInstance;
-                System.out.println(testSupplier.get());
-            }
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-        } catch (InstantiationException e) {
-            e.printStackTrace();
-        } catch (InvocationTargetException e) {
-            e.printStackTrace();
-        } catch (NoSuchMethodException e) {
-            e.printStackTrace();
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
-        }
-    }
-
 }
