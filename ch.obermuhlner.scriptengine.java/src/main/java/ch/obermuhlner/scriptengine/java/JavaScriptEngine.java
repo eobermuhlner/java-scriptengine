@@ -108,15 +108,16 @@ public class JavaScriptEngine implements ScriptEngine, Compilable {
     public CompiledScript compile(String script) throws ScriptException {
         JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
         final DiagnosticCollector<JavaFileObject> diagnostics = new DiagnosticCollector<>();
-        StandardJavaFileManager fileManager = compiler.getStandardFileManager(diagnostics, null, null);
+        StandardJavaFileManager standardFileManager = compiler.getStandardFileManager(diagnostics, null, null);
+        MemoryFileManager memoryFileManager = new MemoryFileManager(standardFileManager);
 
         String simpleClassName = "Script";
         String fullClassName = simpleClassName; // example.Script
         String fileName = simpleClassName + ".class";
 
-        JavaStringObject testSource = new JavaStringObject(simpleClassName, script);
+        JavaFileObject scriptSource = memoryFileManager.createSourceFileObject(null, simpleClassName, script);
 
-        JavaCompiler.CompilationTask task = compiler.getTask(null, fileManager, diagnostics, null, null, Arrays.asList(testSource));
+        JavaCompiler.CompilationTask task = compiler.getTask(null, memoryFileManager, diagnostics, null, null, Arrays.asList(scriptSource));
         if (!task.call()) {
             String message = diagnostics.getDiagnostics().stream()
                     .map(d -> d.toString())
@@ -124,7 +125,7 @@ public class JavaScriptEngine implements ScriptEngine, Compilable {
             throw new ScriptException(message);
         }
 
-        DynamicClassLoader classLoader = new DynamicClassLoader(fullClassName, Path.of(fileName), JavaScriptEngine.class.getClassLoader());
+        ClassLoader classLoader = memoryFileManager.getClassLoader(StandardLocation.CLASS_OUTPUT);
         try {
             Class<?> clazz = classLoader.loadClass(fullClassName);
             Object instance = constructorStrategy.construct(clazz);
