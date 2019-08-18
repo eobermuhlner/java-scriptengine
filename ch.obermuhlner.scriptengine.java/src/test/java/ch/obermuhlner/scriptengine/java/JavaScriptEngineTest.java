@@ -1,18 +1,15 @@
 package ch.obermuhlner.scriptengine.java;
 
-import org.junit.Ignore;
+import ch.obermuhlner.scriptengine.java.execution.MethodExecutionStrategy;
 import org.junit.Test;
 
 import javax.script.*;
-
-import java.io.Reader;
-import java.io.StringReader;
 
 import static org.assertj.core.api.Assertions.*;
 
 public class JavaScriptEngineTest {
     @Test
-    public void testSupplier() throws ScriptException {
+    public void testAutoCallSupplier() throws ScriptException {
         ScriptEngineManager manager = new ScriptEngineManager();
         ScriptEngine engine = manager.getEngineByName("java");
 
@@ -29,7 +26,7 @@ public class JavaScriptEngineTest {
     }
 
     @Test
-    public void testRunnable() throws ScriptException {
+    public void testAutoCallRunnable() throws ScriptException {
         ScriptEngineManager manager = new ScriptEngineManager();
         ScriptEngine engine = manager.getEngineByName("java");
 
@@ -44,10 +41,11 @@ public class JavaScriptEngineTest {
                 "   }" +
                 "}");
         assertThat(result).isEqualTo(null);
+        assertThat(engine.get("message")).isEqualTo("Hello");
     }
 
     @Test
-    public void testCallableMethod() throws ScriptException {
+    public void testAutoCallSingularMethod() throws ScriptException {
         ScriptEngineManager manager = new ScriptEngineManager();
         ScriptEngine engine = manager.getEngineByName("java");
 
@@ -58,5 +56,164 @@ public class JavaScriptEngineTest {
                 "   } " +
                 "}");
         assertThat(result).isEqualTo("Hello");
+    }
+
+    @Test
+    public void failAutoCallSingularMethod() throws ScriptException {
+        ScriptEngineManager manager = new ScriptEngineManager();
+        ScriptEngine engine = manager.getEngineByName("java");
+
+        assertThatThrownBy(() -> {
+            Object result = engine.eval("" +
+                    "public class Script {" +
+                    "}");
+        }).isInstanceOf(ScriptException.class).hasMessageContaining("No method found to execute");
+
+        assertThatThrownBy(() -> {
+            Object result = engine.eval("" +
+                    "public class Script {" +
+                    "   public String getString() {" +
+                    "       return \"String\";" +
+                    "   }" +
+                    "   public int getInt() {" +
+                    "       return 42;" +
+                    "   }" +
+                    "}");
+        }).isInstanceOf(ScriptException.class).hasMessageContaining("No method found to execute");
+    }
+
+    @Test
+    public void testMethodCallByArgumentTypes() throws ScriptException {
+        ScriptEngineManager manager = new ScriptEngineManager();
+        ScriptEngine engine = manager.getEngineByName("java");
+        JavaScriptEngine javaScriptEngine = (JavaScriptEngine) engine;
+
+        javaScriptEngine.setExecutionStrategyFactory((clazz) -> {
+            return MethodExecutionStrategy.byArgumentTypes(
+                    clazz,
+                    "getMessage",
+                    new Class[] { String.class, int.class},
+                    "Hello", 42);
+        });
+
+        Object result = engine.eval("" +
+                "public class Script {" +
+                "   public String getMessage(String message, int value) {" +
+                "       return \"Message: \" + message + value;" +
+                "   } " +
+                "}");
+        assertThat(result).isEqualTo("Message: Hello42");
+    }
+
+    @Test
+    public void testMethodCallByMatchingArgument() throws ScriptException {
+        ScriptEngineManager manager = new ScriptEngineManager();
+        ScriptEngine engine = manager.getEngineByName("java");
+        JavaScriptEngine javaScriptEngine = (JavaScriptEngine) engine;
+
+        javaScriptEngine.setExecutionStrategyFactory((clazz) -> {
+            return MethodExecutionStrategy.byMatchingArguments(
+                    clazz,
+                    "getMessage",
+                    "Hello", 42);
+        });
+
+        Object result = engine.eval("" +
+                "public class Script {" +
+                "   public String getMessage(String message, int value) {" +
+                "       return \"Message: \" + message + value;" +
+                "   } " +
+                "}");
+        assertThat(result).isEqualTo("Message: Hello42");
+    }
+
+    @Test
+    public void testMethodCallByMatchingArgumentAssignable() throws ScriptException {
+        ScriptEngineManager manager = new ScriptEngineManager();
+        ScriptEngine engine = manager.getEngineByName("java");
+        JavaScriptEngine javaScriptEngine = (JavaScriptEngine) engine;
+
+        javaScriptEngine.setExecutionStrategyFactory((clazz) -> {
+            return MethodExecutionStrategy.byMatchingArguments(
+                    clazz,
+                    "getMessage",
+                    "Hello", 42);
+        });
+
+        Object result = engine.eval("" +
+                "public class Script {" +
+                "   public String getMessage(Object message, int value) {" +
+                "       return \"Message: \" + message + value;" +
+                "   } " +
+                "}");
+        assertThat(result).isEqualTo("Message: Hello42");
+    }
+
+    @Test
+    public void testMethodCallByMatchingArgumentNull() throws ScriptException {
+        ScriptEngineManager manager = new ScriptEngineManager();
+        ScriptEngine engine = manager.getEngineByName("java");
+        JavaScriptEngine javaScriptEngine = (JavaScriptEngine) engine;
+
+        javaScriptEngine.setExecutionStrategyFactory((clazz) -> {
+            return MethodExecutionStrategy.byMatchingArguments(
+                    clazz,
+                    "getMessage",
+                    null, 42);
+        });
+
+        Object result = engine.eval("" +
+                "public class Script {" +
+                "   public String getMessage(String message, int value) {" +
+                "       return \"Message: \" + message + value;" +
+                "   } " +
+                "}");
+        assertThat(result).isEqualTo("Message: null42");
+    }
+
+    @Test
+    public void failMethodCallByMatchingArgument() throws ScriptException {
+        ScriptEngineManager manager = new ScriptEngineManager();
+        ScriptEngine engine = manager.getEngineByName("java");
+        JavaScriptEngine javaScriptEngine = (JavaScriptEngine) engine;
+
+        javaScriptEngine.setExecutionStrategyFactory((clazz) -> {
+            return MethodExecutionStrategy.byMatchingArguments(
+                    clazz,
+                    "getMessage",
+                    "Hello", 42);
+        });
+
+        assertThatThrownBy(() -> {
+            Object result = engine.eval("" +
+                    "public class Script {" +
+                    "   public String getMessage(int value1, int value2) {" +
+                    "       return \"Message: \" + value1 + value2;" +
+                    "   } " +
+                    "}");
+        }).isInstanceOf(ScriptException.class);
+    }
+
+    @Test
+    public void failMethodCallByMatchingArgumentNullPrimitive() throws ScriptException {
+        ScriptEngineManager manager = new ScriptEngineManager();
+        ScriptEngine engine = manager.getEngineByName("java");
+        JavaScriptEngine javaScriptEngine = (JavaScriptEngine) engine;
+
+        javaScriptEngine.setExecutionStrategyFactory((clazz) -> {
+            return MethodExecutionStrategy.byMatchingArguments(
+                    clazz,
+                    "getMessage",
+                    null, null);
+        });
+
+        assertThatThrownBy(() -> {
+            Object result = engine.eval("" +
+                    "public class Script {" +
+                    "   public String getMessage(String message, int value) {" +
+                    "       return \"Message: \" + message + value;" +
+                    "   } " +
+                    "}");
+        }).isInstanceOf(ScriptException.class);
     }
 }

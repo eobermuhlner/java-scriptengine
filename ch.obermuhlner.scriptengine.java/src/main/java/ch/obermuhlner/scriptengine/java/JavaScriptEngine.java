@@ -4,31 +4,22 @@ import ch.obermuhlner.scriptengine.java.constructor.ConstructorStrategy;
 import ch.obermuhlner.scriptengine.java.constructor.DefaultConstructorStrategy;
 import ch.obermuhlner.scriptengine.java.execution.AutoExecutionStrategy;
 import ch.obermuhlner.scriptengine.java.execution.ExecutionStrategy;
-import jdk.jshell.*;
-import jdk.jshell.execution.DirectExecutionControl;
-import jdk.jshell.spi.ExecutionControl;
-import jdk.jshell.spi.ExecutionControlProvider;
-import jdk.jshell.spi.ExecutionEnv;
+import ch.obermuhlner.scriptengine.java.execution.ExecutionStrategyFactory;
 
 import javax.script.*;
 import javax.tools.*;
 import java.io.BufferedReader;
-import java.io.File;
 import java.io.IOException;
 import java.io.Reader;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
 import java.nio.file.Path;
 import java.util.*;
 import java.util.function.Function;
-import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 public class JavaScriptEngine implements ScriptEngine, Compilable {
 
     private ConstructorStrategy constructorStrategy = new DefaultConstructorStrategy();
-    private Function<Class<?>, ExecutionStrategy> executionStrategyFunction = (clazz) -> new AutoExecutionStrategy(clazz);
+    private ExecutionStrategyFactory executionStrategyFactory = (clazz) -> new AutoExecutionStrategy(clazz);
 
     private ScriptContext context = new SimpleScriptContext();
 
@@ -36,8 +27,8 @@ public class JavaScriptEngine implements ScriptEngine, Compilable {
         this.constructorStrategy = constructorStrategy;
     }
 
-    public void setExecutionStrategyFunction(Function<Class<?>, ExecutionStrategy> executionStrategyFunction) {
-        this.executionStrategyFunction = executionStrategyFunction;
+    public void setExecutionStrategyFactory(ExecutionStrategyFactory executionStrategyFactory) {
+        this.executionStrategyFactory = executionStrategyFactory;
     }
 
     @Override
@@ -137,7 +128,7 @@ public class JavaScriptEngine implements ScriptEngine, Compilable {
         try {
             Class<?> clazz = classLoader.loadClass(fullClassName);
             Object instance = constructorStrategy.construct(clazz);
-            ExecutionStrategy executionStrategy = executionStrategyFunction.apply(clazz);
+            ExecutionStrategy executionStrategy = executionStrategyFactory.create(clazz);
             return new JavaCompiledScript(this, instance, executionStrategy);
         } catch (ClassNotFoundException e) {
             throw new ScriptException(e);
