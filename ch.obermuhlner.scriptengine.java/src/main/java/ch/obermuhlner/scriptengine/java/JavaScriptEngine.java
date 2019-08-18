@@ -11,9 +11,7 @@ import javax.tools.*;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.Reader;
-import java.nio.file.Path;
 import java.util.*;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 public class JavaScriptEngine implements ScriptEngine, Compilable {
@@ -105,7 +103,7 @@ public class JavaScriptEngine implements ScriptEngine, Compilable {
     }
 
     @Override
-    public CompiledScript compile(String script) throws ScriptException {
+    public JavaCompiledScript compile(String script) throws ScriptException {
         JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
         final DiagnosticCollector<JavaFileObject> diagnostics = new DiagnosticCollector<>();
         StandardJavaFileManager standardFileManager = compiler.getStandardFileManager(diagnostics, null, null);
