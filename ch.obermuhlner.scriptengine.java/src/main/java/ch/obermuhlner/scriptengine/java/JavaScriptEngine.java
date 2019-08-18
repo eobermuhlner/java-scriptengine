@@ -129,7 +129,7 @@ public class JavaScriptEngine implements ScriptEngine, Compilable {
             Class<?> clazz = classLoader.loadClass(fullClassName);
             Object instance = constructorStrategy.construct(clazz);
             ExecutionStrategy executionStrategy = executionStrategyFactory.create(clazz);
-            return new JavaCompiledScript(this, instance, executionStrategy);
+            return new JavaCompiledScript(this, clazz, instance, executionStrategy);
         } catch (ClassNotFoundException e) {
             throw new ScriptException(e);
         }

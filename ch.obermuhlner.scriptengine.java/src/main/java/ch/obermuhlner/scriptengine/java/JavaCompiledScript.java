@@ -10,13 +10,27 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class JavaCompiledScript extends CompiledScript {
-    private JavaScriptEngine engine;
-    private Object instance;
+    private final JavaScriptEngine engine;
+    private final Class<?> instanceClass;
+    private final Object instance;
     private ExecutionStrategy executionStrategy;
 
-    JavaCompiledScript(JavaScriptEngine engine, Object instance, ExecutionStrategy executionStrategy) {
+    JavaCompiledScript(JavaScriptEngine engine, Class<?> instanceClass, Object instance, ExecutionStrategy executionStrategy) {
         this.engine = engine;
+        this.instanceClass = instanceClass;
         this.instance = instance;
+        this.executionStrategy = executionStrategy;
+    }
+
+    public Class<?> getInstanceClass() {
+        return instanceClass;
+    }
+
+    public Object getInstance() {
+        return instance;
+    }
+
+    public void setExecutionStrategy(ExecutionStrategy executionStrategy) {
         this.executionStrategy = executionStrategy;
     }
 
