@@ -19,7 +19,6 @@ production environment.
 
 Known issues:
 * Java script class must be called `Script`
-* Script is compiled into a `Script.class` file in the current directory
 * not possible to access classes of the caller
 
 ## Simple usage
