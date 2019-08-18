@@ -1,5 +1,9 @@
 package ch.obermuhlner.scriptengine.example;
 
+import ch.obermuhlner.scriptengine.java.JavaCompiledScript;
+import ch.obermuhlner.scriptengine.java.JavaScriptEngine;
+import ch.obermuhlner.scriptengine.java.execution.MethodExecutionStrategy;
+
 import javax.script.*;
 
 public class ScriptEngineExample {
@@ -10,8 +14,10 @@ public class ScriptEngineExample {
     private static void runExamples() {
         //runHelloWorldExample();
         //runCompileHelloWorldExample();
-        runCompileEngineBindingsExample();
+        //runCompileEngineBindingsExample();
         //runCompileGlobalBindingsExample();
+        //runMethodExecutionStrategyFactoryMatchingArgumentsExample();
+        runCompiledMethodExecutionStrategyMatchingArgumentsExample();
     }
 
     private static void runHelloWorldExample() {
@@ -142,6 +148,65 @@ public class ScriptEngineExample {
                 System.out.println("Variable1 message: " + globalBindings.get("message"));
                 System.out.println("Variable1 counter: " + engineBindings.get("counter"));
             }
+        } catch (ScriptException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private static void runMethodExecutionStrategyFactoryMatchingArgumentsExample() {
+        try {
+            ScriptEngineManager manager = new ScriptEngineManager();
+            ScriptEngine engine = manager.getEngineByName("java");
+            JavaScriptEngine javaScriptEngine = (JavaScriptEngine) engine;
+
+            javaScriptEngine.setExecutionStrategyFactory((clazz) -> {
+                return MethodExecutionStrategy.byMatchingArguments(
+                        clazz,
+                        "getMessage",
+                        "Hello", 42);
+            });
+
+            Object result = engine.eval("" +
+                    "public class Script {" +
+                    "   public String getMessage(Object message, int value) {" +
+                    "       return \"Message: \" + message + value;" +
+                    "   } " +
+                    "}");
+
+            System.out.println("Result: " + result);
+        } catch (ScriptException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private static void runCompiledMethodExecutionStrategyMatchingArgumentsExample() {
+        try {
+            ScriptEngineManager manager = new ScriptEngineManager();
+            ScriptEngine engine = manager.getEngineByName("java");
+            JavaScriptEngine javaScriptEngine = (JavaScriptEngine) engine;
+
+            javaScriptEngine.setExecutionStrategyFactory((clazz) -> {
+                return MethodExecutionStrategy.byMatchingArguments(
+                        clazz,
+                        "getMessage",
+                        "Hello", 42);
+            });
+
+            JavaCompiledScript compiledScript = javaScriptEngine.compile("" +
+                    "public class Script {" +
+                    "   public String getMessage(Object message, int value) {" +
+                    "       return \"Message: \" + message + value;" +
+                    "   } " +
+                    "}");
+
+            compiledScript.setExecutionStrategy(MethodExecutionStrategy.byMatchingArguments(
+                    compiledScript.getInstanceClass(),
+                    "getMessage",
+                    "Hello", 42));
+
+            Object result = compiledScript.eval();
+
+            System.out.println("Result: " + result);
         } catch (ScriptException e) {
             e.printStackTrace();
         }

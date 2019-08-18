@@ -10,16 +10,13 @@
 The `java-scriptengine` (not to be confused with a `javascript` script engine)
 compiles and executes `Java` files at runtime.
 
-# Project State
-
-This project is NOT YET PRODUCTION READY!
-
-Several issues must be solved before this project can be used in a 
-production environment.
-
-Known issues:
-* Java script class must be called `Script`
-* not possible to access classes of the caller
+The script source is a standard Java class that must follow these rules:
+* public class `Script` in the default package
+* constructor with no arguments (default constructor)
+* Callable entry point. One of the following:
+   * `Script` implements `Supplier`: the `get()` method is called
+   * `Script` implements `Runnable`: the `run()` method is called
+   * `Script` has exactly one `public` method with no arguments
 
 ## Simple usage
 
@@ -139,4 +136,129 @@ Variable1 counter: 2
 Result2: Hello world #2
 Variable2 message: Hello world
 Variable2 counter: 3
+```
+
+## Advanced features of `JavaScriptEngine`
+
+The `JavaScriptEngine` has an additional API to control
+the execution of the `Script` class.
+
+### Set `ConstructorStrategy` in `JavaScriptEngine` 
+
+You can specify the strategy to construct an actual instance of 
+the `Script` class.
+
+The default implementation uses the no-argument default constructor.
+
+```java
+public interface ConstructorStrategy {
+    Object construct(Class<?> clazz) throws ScriptException;
+}
+```
+
+This allows to call a constructor that has arguments
+or a static constructor method.
+
+### Set `ExecutionStrategyFactory` in `JavaScriptEngine`
+
+You can specify the strategy to execute
+the `Script` instance.
+
+The default implementation supports the following:
+   * `Script` implements `Supplier`: the `get()` method is called
+   * `Script` implements `Runnable`: the `run()` method is called
+   * `Script` has exactly one `public` method with no arguments
+
+```java
+public interface ExecutionStrategyFactory {
+    public ExecutionStrategy create(Class<?> clazz) throws ScriptException;
+}
+```
+
+```java
+public interface ExecutionStrategy {
+    Object execute(Object instance) throws ScriptException;
+}
+```
+
+As a convenience the `MethodExecutionStrategy` is already implemented
+and can be used to call a specific method with its arguments.
+
+Use one of the following static constructor methods:
+* `MethodExecutionStrategy.byMethod(Method method, Object... arguments)`
+* `MethodExecutionStrategy.byMatchingArguments(Class<?> clazz, String methodName, Object... arguments) throws ScriptException`
+* `MethodExecutionStrategy.byArgumentTypes(Class<?> clazz, String methodName, Class<?>[] argumentTypes, Object... arguments) throws ScriptException`
+
+The `MethodExecutionStrategy.byMatchingArguments()` is probably
+the most convenient way. It determines a matching function
+by name and the given arguments (ignoring `null` arguments). 
+
+```java
+try {
+    ScriptEngineManager manager = new ScriptEngineManager();
+    ScriptEngine engine = manager.getEngineByName("java");
+    JavaScriptEngine javaScriptEngine = (JavaScriptEngine) engine;
+
+    javaScriptEngine.setExecutionStrategyFactory((clazz) -> {
+        return MethodExecutionStrategy.byMatchingArguments(
+                clazz,
+                "getMessage",
+                "Hello", 42);
+    });
+
+    Object result = engine.eval("" +
+            "public class Script {" +
+            "   public String getMessage(Object message, int value) {" +
+            "       return \"Message: \" + message + value;" +
+            "   } " +
+            "}");
+
+    System.out.println("Result: " + result);
+} catch (ScriptException e) {
+    e.printStackTrace();
+}
+```
+
+The console output shows that `getMessage("Hello", 42)` was called.
+```console
+Result: Message: Hello42
+```
+
+### Set `ExecutionStrategy` in `JavaCompiledScript`
+
+If you compile the script with `Compilable` you can
+specify the `ExecutionStrategy` directly on the compiled script
+instead of using the `ExecutionStrategyFactory` on the engine.
+
+```java
+try {
+    ScriptEngineManager manager = new ScriptEngineManager();
+    ScriptEngine engine = manager.getEngineByName("java");
+    JavaScriptEngine javaScriptEngine = (JavaScriptEngine) engine;
+
+    javaScriptEngine.setExecutionStrategyFactory((clazz) -> {
+        return MethodExecutionStrategy.byMatchingArguments(
+                clazz,
+                "getMessage",
+                "Hello", 42);
+    });
+
+    JavaCompiledScript compiledScript = javaScriptEngine.compile("" +
+            "public class Script {" +
+            "   public String getMessage(Object message, int value) {" +
+            "       return \"Message: \" + message + value;" +
+            "   } " +
+            "}");
+
+    compiledScript.setExecutionStrategy(MethodExecutionStrategy.byMatchingArguments(
+            compiledScript.getInstanceClass(),
+            "getMessage",
+            "Hello", 42));
+
+    Object result = compiledScript.eval();
+
+    System.out.println("Result: " + result);
+} catch (ScriptException e) {
+    e.printStackTrace();
+}
 ```

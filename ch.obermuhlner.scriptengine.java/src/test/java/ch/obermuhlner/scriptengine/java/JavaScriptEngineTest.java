@@ -1,6 +1,7 @@
 package ch.obermuhlner.scriptengine.java;
 
 import ch.obermuhlner.scriptengine.java.execution.MethodExecutionStrategy;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import javax.script.*;
@@ -232,5 +233,27 @@ public class JavaScriptEngineTest {
                     "   } " +
                     "}");
         }).isInstanceOf(ScriptException.class);
+    }
+
+    @Ignore
+    @Test
+    public void testPublicClass() throws ScriptException {
+        ScriptEngineManager manager = new ScriptEngineManager();
+        ScriptEngine engine = manager.getEngineByName("java");
+
+        Object result = engine.eval("" +
+                "public class Script {" +
+                "   public Object getMessage() {" +
+                "       PublicClass result = new ch.obermuhlner.scriptengine.java.JavaScriptEngineTest.PublicClass();" +
+                "       result.message = \"Hello\";" +
+                "       return result.message;" +
+                "   } " +
+                "}");
+        //assertThat(result).isInstanceOf(PublicClass.class);
+        assertThat(result).isEqualTo("Hello");
+    }
+
+    public static class PublicClass {
+        public String message;
     }
 }
