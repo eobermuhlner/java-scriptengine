@@ -48,7 +48,7 @@ public class AutoExecutionStrategy implements ExecutionStrategy {
         List<Method> callableMethods = new ArrayList<>();
         for (Method method : clazz.getDeclaredMethods()) {
             int modifiers = method.getModifiers();
-            if (method.getParameterCount() == 0 && Modifier.isPublic(modifiers) && !Modifier.isStatic(modifiers)) {
+            if (method.getParameterCount() == 0 && Modifier.isPublic(modifiers)) {
                 callableMethods.add(method);
             }
         }

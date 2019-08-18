@@ -53,7 +53,7 @@ public class JavaScriptEngineTest {
                 "public class Script {" +
                 "   public String getMessage() {" +
                 "       return \"Hello\";" +
-                "   } " +
+                "   }" +
                 "}");
         assertThat(result).isEqualTo("Hello");
     }
@@ -80,6 +80,23 @@ public class JavaScriptEngineTest {
                     "   }" +
                     "}");
         }).isInstanceOf(ScriptException.class).hasMessageContaining("No method found to execute");
+    }
+
+    @Test
+    public void testAutoCallSingularStaticMethod() throws ScriptException {
+        ScriptEngineManager manager = new ScriptEngineManager();
+        ScriptEngine engine = manager.getEngineByName("java");
+
+        Object result = engine.eval("" +
+                "public class Script {" +
+                "   public String getMessage(String message) {" +
+                "       return \"Message: \" + message;" +
+                "   }" +
+                "   public static String main() {" +
+                "       return new Script().getMessage(\"Hello\");" +
+                "   }" +
+                "}");
+        assertThat(result).isEqualTo("Message: Hello");
     }
 
     @Test
