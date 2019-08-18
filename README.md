@@ -20,6 +20,7 @@ production environment.
 Known issues:
 * Java script class must be called `Script`
 * Script is compiled into a `Script.class` file in the current directory
+* not possible to access classes of the caller
 
 ## Simple usage
 
@@ -87,11 +88,8 @@ Result2: Hello World #2
 
 ## Bindings instance variables (fields) 
 
-You can read and write instance variables (fields) by using `Bindings` in the script engine.
-
-In the `ScriptEngine` API the instance variables are
-in the scope `ScriptContext.ENGINE_SCOPE` which you can
-pass as argument in the `eval()` method.
+You can read and write variables, both instance variables (fields) and static variables,
+by using `Bindings` in the script engine.
 
 ```java
 try {
@@ -101,7 +99,7 @@ try {
 
     CompiledScript compiledScript = compiler.compile("" +
             "public class Script {" +
-            "   public String message = \"Counting\";" +
+            "   public static String message = \"Counting\";" +
             "   public int counter = 1;" +
             "   public String getMessage() {" +
             "       return message + \" #\" + counter++;" +
@@ -133,7 +131,8 @@ try {
 }
 ```
 
-The console output shows that bindings can read and write values. 
+The console output shows that bindings can read and write values
+from both instance and static variables of your class. 
 ```console
 Result1: Counting #1
 Variable1 message: Counting

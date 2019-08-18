@@ -10,7 +10,8 @@ public class ScriptEngineExample {
     private static void runExamples() {
         //runHelloWorldExample();
         //runCompileHelloWorldExample();
-        runCompileBindingsExample();
+        runCompileEngineBindingsExample();
+        //runCompileGlobalBindingsExample();
     }
 
     private static void runHelloWorldExample() {
@@ -54,7 +55,7 @@ public class ScriptEngineExample {
         }
     }
 
-    private static void runCompileBindingsExample() {
+    private static void runCompileEngineBindingsExample() {
         try {
             ScriptEngineManager manager = new ScriptEngineManager();
             ScriptEngine engine = manager.getEngineByName("java");
@@ -62,7 +63,7 @@ public class ScriptEngineExample {
 
             CompiledScript compiledScript = compiler.compile("" +
                     "public class Script {" +
-                    "   public String message = \"Counting\";" +
+                    "   public static String message = \"Counting\";" +
                     "   public int counter = 1;" +
                     "   public String getMessage() {" +
                     "       return message + \" #\" + counter++;" +
@@ -88,6 +89,58 @@ public class ScriptEngineExample {
                 System.out.println("Result2: " + result);
                 System.out.println("Variable2 message: " + bindings.get("message"));
                 System.out.println("Variable2 counter: " + bindings.get("counter"));
+            }
+        } catch (ScriptException e) {
+            e.printStackTrace();
+        }
+    }
+
+
+    private static void runCompileGlobalBindingsExample() {
+        try {
+            ScriptEngineManager manager = new ScriptEngineManager();
+            ScriptEngine engine = manager.getEngineByName("java");
+            Compilable compiler = (Compilable) engine;
+
+            String script = "" +
+                    "public class Script {" +
+                    "   public String message = \"Counting\";" +
+                    "   public int counter = 1;" +
+                    "   public String getMessage() {" +
+                    "       return message + \" #\" + counter++;" +
+                    "   } " +
+                    "}";
+
+            CompiledScript compiledScript1 = compiler.compile(script);
+            CompiledScript compiledScript2 = compiler.compile(script);
+
+            Bindings engineBindings = engine.getBindings(ScriptContext.ENGINE_SCOPE);
+            Bindings globalBindings = engine.getBindings(ScriptContext.GLOBAL_SCOPE);
+
+            {
+                Object result = compiledScript1.eval();
+
+                System.out.println("Result1: " + result);
+                System.out.println("Variable1 message: " + globalBindings.get("message"));
+                System.out.println("Variable1 counter: " + engineBindings.get("counter"));
+            }
+
+            globalBindings.put("message", "Hello static world");
+
+            {
+                Object result = compiledScript2.eval();
+
+                System.out.println("Result2: " + result);
+                System.out.println("Variable2 message: " + globalBindings.get("message"));
+                System.out.println("Variable2 counter: " + engineBindings.get("counter"));
+            }
+
+            {
+                Object result = compiledScript1.eval();
+
+                System.out.println("Result1: " + result);
+                System.out.println("Variable1 message: " + globalBindings.get("message"));
+                System.out.println("Variable1 counter: " + engineBindings.get("counter"));
             }
         } catch (ScriptException e) {
             e.printStackTrace();
