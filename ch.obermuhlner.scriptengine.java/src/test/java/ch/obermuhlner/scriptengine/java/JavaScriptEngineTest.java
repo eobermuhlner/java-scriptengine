@@ -11,6 +11,35 @@ import static org.assertj.core.api.Assertions.*;
 
 public class JavaScriptEngineTest {
     @Test
+    public void testClassInDefaultPackage() throws ScriptException {
+        ScriptEngineManager manager = new ScriptEngineManager();
+        ScriptEngine engine = manager.getEngineByName("java");
+
+        Object result = engine.eval("" +
+                "public class ClassInDefaultPackage {" +
+                "   public String getMessage() {" +
+                "       return getClass().getName();" +
+                "   }" +
+                "}");
+        assertThat(result).isEqualTo("ClassInDefaultPackage");
+    }
+
+    @Test
+    public void testClassInPackage() throws ScriptException {
+        ScriptEngineManager manager = new ScriptEngineManager();
+        ScriptEngine engine = manager.getEngineByName("java");
+
+        Object result = engine.eval("" +
+                "package com.example;" +
+                "public class ClassInPackage {" +
+                "   public String getMessage() {" +
+                "       return getClass().getName();" +
+                "   }" +
+                "}");
+        assertThat(result).isEqualTo("com.example.ClassInPackage");
+    }
+
+    @Test
     public void testAutoCallSupplier() throws ScriptException {
         ScriptEngineManager manager = new ScriptEngineManager();
         ScriptEngine engine = manager.getEngineByName("java");

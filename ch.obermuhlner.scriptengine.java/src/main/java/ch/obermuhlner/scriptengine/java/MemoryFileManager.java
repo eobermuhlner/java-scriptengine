@@ -57,7 +57,7 @@ import javax.tools.StandardLocation;
  *
  * @author Robert Field
  */
-class MemoryFileManager implements JavaFileManager {
+public class MemoryFileManager implements JavaFileManager {
 
     private final StandardJavaFileManager stdFileManager;
 

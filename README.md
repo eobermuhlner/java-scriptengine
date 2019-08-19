@@ -11,12 +11,14 @@ The `java-scriptengine` (not to be confused with a `javascript` script engine)
 compiles and executes `Java` files at runtime.
 
 The script source is a standard Java class that must follow these rules:
-* public class `Script` in the default package
+* public class
 * constructor with no arguments (default constructor)
 * Callable entry point. One of the following:
-   * `Script` implements `Supplier`: the `get()` method is called
-   * `Script` implements `Runnable`: the `run()` method is called
-   * `Script` has exactly one `public` method with no arguments
+   * class implements `Supplier`: the `get()` method is called
+   * class implements `Runnable`: the `run()` method is called
+   * class has exactly one `public` method with no arguments
+
+The script class can be arbitrarily named and may be in a named package or the default package. 
 
 ## Simple usage
 

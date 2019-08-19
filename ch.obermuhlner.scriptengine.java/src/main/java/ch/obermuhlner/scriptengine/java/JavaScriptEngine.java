@@ -5,6 +5,8 @@ import ch.obermuhlner.scriptengine.java.constructor.DefaultConstructorStrategy;
 import ch.obermuhlner.scriptengine.java.execution.AutoExecutionStrategy;
 import ch.obermuhlner.scriptengine.java.execution.ExecutionStrategy;
 import ch.obermuhlner.scriptengine.java.execution.ExecutionStrategyFactory;
+import ch.obermuhlner.scriptengine.java.name.NameStrategy;
+import ch.obermuhlner.scriptengine.java.name.ScriptScannerNameStrategy;
 
 import javax.script.*;
 import javax.tools.*;
@@ -16,10 +18,15 @@ import java.util.stream.Collectors;
 
 public class JavaScriptEngine implements ScriptEngine, Compilable {
 
+    private NameStrategy nameStrategy = new ScriptScannerNameStrategy();
     private ConstructorStrategy constructorStrategy = DefaultConstructorStrategy.byDefaultConstructor();
     private ExecutionStrategyFactory executionStrategyFactory = (clazz) -> new AutoExecutionStrategy(clazz);
 
     private ScriptContext context = new SimpleScriptContext();
+
+    public void setNameStrategy(NameStrategy nameStrategy) {
+        this.nameStrategy = nameStrategy;
+    }
 
     public void setConstructorStrategy(ConstructorStrategy constructorStrategy) {
         this.constructorStrategy = constructorStrategy;
@@ -109,9 +116,8 @@ public class JavaScriptEngine implements ScriptEngine, Compilable {
         StandardJavaFileManager standardFileManager = compiler.getStandardFileManager(diagnostics, null, null);
         MemoryFileManager memoryFileManager = new MemoryFileManager(standardFileManager);
 
-        String simpleClassName = "Script";
-        String fullClassName = simpleClassName; // example.Script
-        String fileName = simpleClassName + ".class";
+        String fullClassName = nameStrategy.getFullName(script);
+        String simpleClassName = NameStrategy.extractSimpleName(fullClassName);
 
         JavaFileObject scriptSource = memoryFileManager.createSourceFileObject(null, simpleClassName, script);
 
