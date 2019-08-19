@@ -2,10 +2,15 @@ package ch.obermuhlner.scriptengine.java;
 
 import ch.obermuhlner.scriptengine.java.constructor.DefaultConstructorStrategy;
 import ch.obermuhlner.scriptengine.java.execution.MethodExecutionStrategy;
+import ch.obermuhlner.scriptengine.java.name.FixNameStrategy;
 import org.junit.Ignore;
 import org.junit.Test;
 
 import javax.script.*;
+
+import java.io.IOException;
+import java.io.Reader;
+import java.io.StringReader;
 
 import static org.assertj.core.api.Assertions.*;
 
@@ -37,6 +42,23 @@ public class JavaScriptEngineTest {
                 "   }" +
                 "}");
         assertThat(result).isEqualTo("com.example.ClassInPackage");
+    }
+
+    @Test
+    public void testFixNameStrategy() throws ScriptException {
+        ScriptEngineManager manager = new ScriptEngineManager();
+        ScriptEngine engine = manager.getEngineByName("java");
+        JavaScriptEngine javaScriptEngine = (JavaScriptEngine) engine;
+
+        javaScriptEngine.setNameStrategy(new FixNameStrategy("NeedFixName"));
+
+        Object result = engine.eval("" +
+                "public /*break*/ class NeedFixName {" +
+                "   public String getMessage() {" +
+                "       return getClass().getName();" +
+                "   }" +
+                "}");
+        assertThat(result).isEqualTo("NeedFixName");
     }
 
     @Test
@@ -288,6 +310,66 @@ public class JavaScriptEngineTest {
         assertThat(result).isEqualTo("Message: Hello42");
     }
 
+    @Test
+    public void testCompilable() throws ScriptException {
+        ScriptEngineManager manager = new ScriptEngineManager();
+        ScriptEngine engine = manager.getEngineByName("java");
+        assertThat(engine).isInstanceOf(Compilable.class);
+
+        String script = "" +
+                "public class CompiledScript {" +
+                "   public static String message;" +
+                "   public int counter;" +
+                "   public String getMessage() {" +
+                "       return \"Message: \" + message + counter++;" +
+                "   }" +
+                "}";
+
+        Compilable compiler = (Compilable) engine;
+        CompiledScript compiledScript = compiler.compile(script);
+        assertThat(compiledScript.getEngine()).isSameAs(engine);
+
+        JavaCompiledScript javaCompiledScript = (JavaCompiledScript) compiledScript;
+        assertThat(javaCompiledScript.getInstanceClass().getName()).isEqualTo("CompiledScript");
+        assertThat(javaCompiledScript.getInstance()).isNotNull();
+        assertThat(javaCompiledScript.getInstance().getClass().getName()).isEqualTo("CompiledScript");
+
+        for (int i = 0; i < 2; i++) {
+            Bindings bindings = engine.createBindings();
+
+            bindings.put("message", "Hello-");
+            bindings.put("counter", i);
+            Object result = compiledScript.eval(bindings);
+
+            assertThat(result).isEqualTo("Message: Hello-" + i);
+            assertThat(bindings.get("counter")).isEqualTo(i + 1);
+        }
+    }
+
+    @Test
+    public void testCompilableExecutionStrategy() throws ScriptException {
+        ScriptEngineManager manager = new ScriptEngineManager();
+        ScriptEngine engine = manager.getEngineByName("java");
+        Compilable compiler = (Compilable) engine;
+
+        CompiledScript compiledScript = compiler.compile("" +
+                "public class Script {" +
+                "   public String getMessage(String message, int value) {" +
+                "       return \"Message: \" + message + value;" +
+                "   } " +
+                "}");
+        JavaCompiledScript javaCompiledScript = (JavaCompiledScript) compiledScript;
+
+        javaCompiledScript.setExecutionStrategy(MethodExecutionStrategy.byMatchingArguments(
+                    javaCompiledScript.getInstanceClass(),
+                    "getMessage",
+                    "Hello", 42));
+
+        Object result = javaCompiledScript.eval();
+
+        assertThat(result).isEqualTo("Message: Hello42");
+    }
+
     @Ignore
     @Test
     public void testPublicClass() throws ScriptException {
@@ -306,7 +388,148 @@ public class JavaScriptEngineTest {
         assertThat(result).isEqualTo("Hello");
     }
 
+    @Test
+    public void testEvalReader() throws ScriptException {
+        ScriptEngineManager manager = new ScriptEngineManager();
+        ScriptEngine engine = manager.getEngineByName("java");
+
+        Reader reader = new StringReader("" +
+                "public class Script {" +
+                "   public int getValue() {" +
+                "       return 1234;" +
+                "   }" +
+                "}");
+        Object result = engine.eval(reader);
+        assertThat(result).isEqualTo(1234);
+    }
+
+    @Test
+    public void testEvalReaderContext() throws ScriptException {
+        ScriptEngineManager manager = new ScriptEngineManager();
+        ScriptEngine engine = manager.getEngineByName("java");
+
+        ScriptContext context = new SimpleScriptContext();
+        context.getBindings(ScriptContext.ENGINE_SCOPE).put("alpha", 1000);
+
+        Reader reader = new StringReader("" +
+                "public class Script {" +
+                "   public int alpha;" +
+                "   public int getValue() {" +
+                "       return alpha + 999;" +
+                "   }" +
+                "}");
+        Object result = engine.eval(reader, context);
+        assertThat(result).isEqualTo(1999);
+    }
+
+    @Test
+    public void testEvalReaderBindings() throws ScriptException {
+        ScriptEngineManager manager = new ScriptEngineManager();
+        ScriptEngine engine = manager.getEngineByName("java");
+
+        SimpleBindings bindings = new SimpleBindings();
+        bindings.put("alpha", 1000);
+
+        Reader reader = new StringReader("" +
+                "public class Script {" +
+                "   public int alpha;" +
+                "   public int getValue() {" +
+                "       return alpha + 321;" +
+                "   }" +
+                "}");
+        Object result = engine.eval(reader, bindings);
+        assertThat(result).isEqualTo(1321);
+    }
+
+    @Test
+    public void failEvalReader() {
+        ScriptEngineManager manager = new ScriptEngineManager();
+        ScriptEngine engine = manager.getEngineByName("java");
+
+        Reader reader = new FailReader();
+        assertThatThrownBy(() -> {
+            Object result = engine.eval(reader);
+        }).isInstanceOf(ScriptException.class);
+    }
+
+    @Test
+    public void testSetGetContext() throws ScriptException {
+        ScriptEngineManager manager = new ScriptEngineManager();
+        ScriptEngine engine = manager.getEngineByName("java");
+
+        assertThat(engine.getContext()).isNotNull();
+
+        SimpleScriptContext context = new SimpleScriptContext();
+        engine.setContext(context);
+        assertThat(engine.getContext()).isSameAs(context);
+
+        assertThatThrownBy(() -> {
+            engine.setContext(null);
+        }).isInstanceOf(NullPointerException.class);
+    }
+
+    @Test
+    public void testCreateBindings() throws ScriptException {
+        ScriptEngineManager manager = new ScriptEngineManager();
+        ScriptEngine engine = manager.getEngineByName("java");
+
+        assertThat(engine.createBindings()).isNotNull();
+    }
+
+    @Test
+    public void testSetBindings() throws ScriptException {
+        ScriptEngineManager manager = new ScriptEngineManager();
+        ScriptEngine engine = manager.getEngineByName("java");
+
+        engine.setBindings(null, ScriptContext.GLOBAL_SCOPE);
+
+        assertThatThrownBy(() -> {
+            engine.setBindings(null, ScriptContext.ENGINE_SCOPE);
+        }).isInstanceOf(NullPointerException.class);
+
+        assertThatThrownBy(() -> {
+            engine.setBindings(new SimpleBindings(), -999);
+        }).isInstanceOf(IllegalArgumentException.class);
+    }
+
+    @Test
+    public void testGetFactory() throws ScriptException {
+        ScriptEngineManager manager = new ScriptEngineManager();
+        ScriptEngine engine = manager.getEngineByName("java");
+
+        ScriptEngineFactory factory = engine.getFactory();
+        assertThat(factory.getClass()).isSameAs(JavaScriptEngineFactory.class);
+    }
+
+    @Test
+    public void failSyntaxError() throws ScriptException {
+        ScriptEngineManager manager = new ScriptEngineManager();
+        ScriptEngine engine = manager.getEngineByName("java");
+
+        assertThatThrownBy(() -> {
+            engine.eval("" +
+                    "public class Script {" +
+                    "   XXX" +
+                    "}");
+        }).isInstanceOf(ScriptException.class);
+    }
+
     public static class PublicClass {
         public String message;
+    }
+
+    public static class FailReader extends Reader {
+        public FailReader() {
+        }
+
+        @Override
+        public int read(char[] cbuf, int off, int len) throws IOException {
+            throw new IOException("FailReader: always fails in read()");
+        }
+
+        @Override
+        public void close() throws IOException {
+            throw new IOException("FailReader: always fails in close()");
+        }
     }
 }
