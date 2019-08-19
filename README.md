@@ -18,7 +18,11 @@ The script source is a standard Java class that must follow these rules:
    * class implements `Runnable`: the `run()` method is called
    * class has exactly one `public` method with no arguments
 
-The script class can be arbitrarily named and may be in a named package or the default package. 
+The script class can be arbitrarily named and may be in a named package or the default package.
+
+Note: The scanner that parses the script for package and class names is very simple.
+Avoid confusing it with comments that contain the keywords `package` or `public class`
+or comments between the keywords and the package/class names.
 
 ## Simple usage
 
@@ -143,12 +147,25 @@ Variable2 counter: 3
 ## Advanced features of `JavaScriptEngine`
 
 The `JavaScriptEngine` has an additional API to control
-the execution of the `Script` class.
+the execution of the script class.
+
+### Set `NameStrategy` in `JavaScriptEngine` 
+
+You can specify the strategy to determine the name of the script class.
+
+The default implementation uses a simple (regular expression based) scanner
+to find the package name and the class name in the script.
+
+```java
+public interface NameStrategy {
+    String getFullName(String script) throws ScriptException;
+}
+```
 
 ### Set `ConstructorStrategy` in `JavaScriptEngine` 
 
 You can specify the strategy to construct an actual instance of 
-the `Script` class.
+the script class.
 
 The default implementation uses the no-argument default constructor.
 
