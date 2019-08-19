@@ -2,11 +2,11 @@ package ch.obermuhlner.scriptengine.java;
 
 import ch.obermuhlner.scriptengine.java.constructor.ConstructorStrategy;
 import ch.obermuhlner.scriptengine.java.constructor.DefaultConstructorStrategy;
-import ch.obermuhlner.scriptengine.java.execution.AutoExecutionStrategy;
+import ch.obermuhlner.scriptengine.java.execution.DefaultExecutionStrategy;
 import ch.obermuhlner.scriptengine.java.execution.ExecutionStrategy;
 import ch.obermuhlner.scriptengine.java.execution.ExecutionStrategyFactory;
 import ch.obermuhlner.scriptengine.java.name.NameStrategy;
-import ch.obermuhlner.scriptengine.java.name.ScriptScannerNameStrategy;
+import ch.obermuhlner.scriptengine.java.name.DefaultNameStrategy;
 
 import javax.script.*;
 import javax.tools.*;
@@ -18,9 +18,9 @@ import java.util.stream.Collectors;
 
 public class JavaScriptEngine implements ScriptEngine, Compilable {
 
-    private NameStrategy nameStrategy = new ScriptScannerNameStrategy();
+    private NameStrategy nameStrategy = new DefaultNameStrategy();
     private ConstructorStrategy constructorStrategy = DefaultConstructorStrategy.byDefaultConstructor();
-    private ExecutionStrategyFactory executionStrategyFactory = (clazz) -> new AutoExecutionStrategy(clazz);
+    private ExecutionStrategyFactory executionStrategyFactory = (clazz) -> new DefaultExecutionStrategy(clazz);
 
     private ScriptContext context = new SimpleScriptContext();
 

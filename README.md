@@ -51,7 +51,7 @@ Result: Hello World
 
 ## Compiling
 
-Calling `ScriptEngine.eval()` multiple times is very efficient¨because
+Calling `ScriptEngine.eval()` multiple times is very efficient because
 the same script has to be compiled every time.
 
 The `JavaScriptEngine` implements the `Compilable` interface which
@@ -151,10 +151,8 @@ the execution of the script class.
 
 ### Set `NameStrategy` in `JavaScriptEngine` 
 
-You can specify the strategy to determine the name of the script class.
-
-The default implementation uses a simple (regular expression based) scanner
-to find the package name and the class name in the script.
+You can specify the strategy to determine the name of the script class
+from the script.
 
 ```java
 public interface NameStrategy {
@@ -162,12 +160,17 @@ public interface NameStrategy {
 }
 ```
 
+The default implementation `DefaultNameStrategy` uses a simple
+(regular expression based) scanner
+to find the package name and the class name in the script.
+
+Alternatively the `FixNameStrategy` allows to set an explicit
+fully qualified class name. 
+
 ### Set `ConstructorStrategy` in `JavaScriptEngine` 
 
 You can specify the strategy to construct an actual instance of 
 the script class.
-
-The default implementation uses the no-argument default constructor.
 
 ```java
 public interface ConstructorStrategy {
@@ -175,12 +178,16 @@ public interface ConstructorStrategy {
 }
 ```
 
-This allows to call a constructor that has arguments
-or a static constructor method.
+The default implementation `DefaultConstructorStrategy`
+uses the no-argument default constructor.
+
+Additional static constructor methods `DefaultConstructorStrategy`
+allow to use a constructor with explicit arguments.
 
 The following example uses the
 convenience `DefaultConstructorStrategy.byMatchingArguments()`
-to specify the constructor arguments to be used:
+to to determine a matching constructor
+using the given arguments:
 ```java
 try {
     ScriptEngineManager manager = new ScriptEngineManager();
@@ -210,13 +217,9 @@ try {
 
 ### Set `ExecutionStrategyFactory` in `JavaScriptEngine`
 
-You can specify the strategy to execute
-the `Script` instance.
-
-The default implementation supports the following:
-   * `Script` implements `Supplier`: the `get()` method is called
-   * `Script` implements `Runnable`: the `run()` method is called
-   * `Script` has exactly one `public` method with no arguments
+You can specify the strategy to execute the script class instance
+by providing a factory that creates an `ExecutionStrategy`
+from a `Class<?>`.
 
 ```java
 public interface ExecutionStrategyFactory {
@@ -230,7 +233,12 @@ public interface ExecutionStrategy {
 }
 ```
 
-As a convenience the `MethodExecutionStrategy` is already implemented
+The default implementation `DefaultExecutionStrategy` supports the following:
+   * class implements `Supplier`: the `get()` method is called
+   * class implements `Runnable`: the `run()` method is called
+   * class has exactly one `public` method with no arguments
+
+Alternatively the `MethodExecutionStrategy` is already implemented
 and can be used to call a specific method with its arguments.
 
 Use one of the following static constructor methods:

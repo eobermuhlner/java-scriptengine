@@ -8,11 +8,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Supplier;
 
-public class AutoExecutionStrategy implements ExecutionStrategy {
+public class DefaultExecutionStrategy implements ExecutionStrategy {
 
     private final Method method;
 
-    public AutoExecutionStrategy(Class<?> clazz) {
+    public DefaultExecutionStrategy(Class<?> clazz) {
         method = findCallableMethod(clazz);
     }
 

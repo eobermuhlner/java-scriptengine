@@ -2,29 +2,67 @@ package ch.obermuhlner.scriptengine.java.name;
 
 import org.junit.Test;
 
+import javax.script.ScriptException;
+
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 public class DefaultNameStrategyTest {
     @Test
-    public void testSimpleName() {
-        String script = "script";
-        DefaultNameStrategy nameStrategy = new DefaultNameStrategy("Test");
-        String fullName = nameStrategy.getFullName(script);
+    public void testSimpleNames() throws ScriptException {
+        DefaultNameStrategy nameStrategy = new DefaultNameStrategy();
 
-        assertThat(fullName).isEqualTo("Test");
-        assertThat(NameStrategy.extractSimpleName(fullName)).isEqualTo("Test");
-        assertThat(NameStrategy.extractPackageName(fullName)).isEqualTo("");
+        assertThat(nameStrategy.getFullName("public class Alpha {}")).isEqualTo("Alpha");
+        assertThat(nameStrategy.getFullName("public class Beta$ {}")).isEqualTo("Beta$");
     }
 
     @Test
-    public void testFullyQualifiedName() {
-        String script = "script";
-        DefaultNameStrategy nameStrategy = new DefaultNameStrategy("com.example.Test");
-        String fullName = nameStrategy.getFullName(script);
+    public void testPackageAndNames() throws ScriptException {
+        DefaultNameStrategy nameStrategy = new DefaultNameStrategy();
 
-        assertThat(fullName).isEqualTo("com.example.Test");
-        assertThat(NameStrategy.extractSimpleName(fullName)).isEqualTo("Test");
-        assertThat(NameStrategy.extractPackageName(fullName)).isEqualTo("com.example");
+        assertThat(nameStrategy.getFullName("package com.example; public class Alpha {}")).isEqualTo("com.example.Alpha");
     }
 
+    @Test
+    public void testMultipleLines() throws ScriptException {
+        DefaultNameStrategy nameStrategy = new DefaultNameStrategy();
+
+        assertThat(nameStrategy.getFullName("" +
+                "/* Comment */\n" +
+                "package com.example;\n" +
+                "public class Alpha {\n" +
+                "}"))
+                .isEqualTo("com.example.Alpha");
+
+
+        assertThat(nameStrategy.getFullName("" +
+                "/* Comment */\n" +
+                "package \n" +
+                "  com.example ;\n" +
+                "\n" +
+                "public\n" +
+                "\tclass\n" +
+                "\n" +
+                "Alpha\n" +
+                "{\n" +
+                "}"))
+                .isEqualTo("com.example.Alpha");
+    }
+
+    @Test
+    public void failSimpleNames() {
+        DefaultNameStrategy nameStrategy = new DefaultNameStrategy();
+
+        assertThatThrownBy(() -> {
+            nameStrategy.getFullName("");
+        }).isInstanceOf(ScriptException.class);
+
+        assertThatThrownBy(() -> {
+            nameStrategy.getFullName("public class {}");
+        }).isInstanceOf(ScriptException.class);
+
+        assertThatThrownBy(() -> {
+            nameStrategy.getFullName("class Alpha {}");
+        }).isInstanceOf(ScriptException.class);
+    }
 }

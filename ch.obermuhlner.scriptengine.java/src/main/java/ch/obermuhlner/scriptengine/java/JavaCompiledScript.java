@@ -1,11 +1,9 @@
 package ch.obermuhlner.scriptengine.java;
 
-import ch.obermuhlner.scriptengine.java.execution.AutoExecutionStrategy;
 import ch.obermuhlner.scriptengine.java.execution.ExecutionStrategy;
 
 import javax.script.*;
 import java.lang.reflect.Field;
-import java.lang.reflect.Modifier;
 import java.util.HashMap;
 import java.util.Map;
 
