@@ -1,5 +1,6 @@
 package ch.obermuhlner.scriptengine.java;
 
+import ch.obermuhlner.scriptengine.java.constructor.DefaultConstructorStrategy;
 import ch.obermuhlner.scriptengine.java.execution.MethodExecutionStrategy;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -18,7 +19,7 @@ public class JavaScriptEngineTest {
                 "public class Script implements java.util.function.Supplier<String> {" +
                 "   public String get() {" +
                 "       return \"Hello\";" +
-                "   } " +
+                "   }" +
                 "   public int ignore() {" +
                 "       return -1;" +
                 "   }" +
@@ -65,13 +66,13 @@ public class JavaScriptEngineTest {
         ScriptEngine engine = manager.getEngineByName("java");
 
         assertThatThrownBy(() -> {
-            Object result = engine.eval("" +
+            engine.eval("" +
                     "public class Script {" +
                     "}");
         }).isInstanceOf(ScriptException.class).hasMessageContaining("No method found to execute");
 
         assertThatThrownBy(() -> {
-            Object result = engine.eval("" +
+            engine.eval("" +
                     "public class Script {" +
                     "   public String getString() {" +
                     "       return \"String\";" +
@@ -203,7 +204,7 @@ public class JavaScriptEngineTest {
         });
 
         assertThatThrownBy(() -> {
-            Object result = engine.eval("" +
+            engine.eval("" +
                     "public class Script {" +
                     "   public String getMessage(int value1, int value2) {" +
                     "       return \"Message: \" + value1 + value2;" +
@@ -226,13 +227,36 @@ public class JavaScriptEngineTest {
         });
 
         assertThatThrownBy(() -> {
-            Object result = engine.eval("" +
+            engine.eval("" +
                     "public class Script {" +
                     "   public String getMessage(String message, int value) {" +
                     "       return \"Message: \" + message + value;" +
                     "   } " +
                     "}");
         }).isInstanceOf(ScriptException.class);
+    }
+
+    @Test
+    public void testConstructorWithArguments() throws ScriptException {
+        ScriptEngineManager manager = new ScriptEngineManager();
+        ScriptEngine engine = manager.getEngineByName("java");
+        JavaScriptEngine javaScriptEngine = (JavaScriptEngine) engine;
+
+        javaScriptEngine.setConstructorStrategy(DefaultConstructorStrategy.byArgumentTypes(new Class<?>[] { String.class, int.class }, "Hello", 42));
+
+        Object result = engine.eval("" +
+                "public class Script {" +
+                "   private final String message;" +
+                "   private final int value;" +
+                "   public Script(String message, int value) {" +
+                "       this.message = message;" +
+                "       this.value = value;" +
+                "   }" +
+                "   public String getMessage() {" +
+                "       return \"Message: \" + message + value;" +
+                "   }" +
+                "}");
+        assertThat(result).isEqualTo("Message: Hello42");
     }
 
     @Ignore

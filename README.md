@@ -159,6 +159,36 @@ public interface ConstructorStrategy {
 This allows to call a constructor that has arguments
 or a static constructor method.
 
+The following example uses the
+convenience `DefaultConstructorStrategy.byMatchingArguments()`
+to specify the constructor arguments to be used:
+```java
+try {
+    ScriptEngineManager manager = new ScriptEngineManager();
+    ScriptEngine engine = manager.getEngineByName("java");
+    JavaScriptEngine javaScriptEngine = (JavaScriptEngine) engine;
+
+    javaScriptEngine.setConstructorStrategy(DefaultConstructorStrategy.byMatchingArguments("Hello", 42));
+
+    Object result = engine.eval("" +
+            "public class Script {" +
+            "   private final String message;" +
+            "   private final int value;" +
+            "   public Script(String message, int value) {" +
+            "       this.message = message;" +
+            "       this.value = value;" +
+            "   }" +
+            "   public String getMessage() {" +
+            "       return \"Message: \" + message + value;" +
+            "   }" +
+            "}");
+
+    System.out.println("Result: " + result);
+} catch (ScriptException e) {
+    e.printStackTrace();
+}
+```
+
 ### Set `ExecutionStrategyFactory` in `JavaScriptEngine`
 
 You can specify the strategy to execute

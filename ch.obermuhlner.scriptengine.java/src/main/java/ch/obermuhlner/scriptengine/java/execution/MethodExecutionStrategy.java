@@ -1,11 +1,12 @@
 package ch.obermuhlner.scriptengine.java.execution;
 
+import ch.obermuhlner.scriptengine.java.internal.ReflectionUtil;
+
 import javax.script.ScriptException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 public class MethodExecutionStrategy implements ExecutionStrategy {
@@ -40,58 +41,23 @@ public class MethodExecutionStrategy implements ExecutionStrategy {
     }
 
     public static MethodExecutionStrategy byMatchingArguments(Class<?> clazz, String methodName, Object... arguments) throws ScriptException {
-        List<Method> callableMethods = new ArrayList<>();
+        List<Method> matchingMethods = new ArrayList<>();
         for (Method method : clazz.getMethods()) {
             if ((method.getModifiers() & Modifier.PUBLIC) != 0) {
-                if (matchesArguments(method, arguments)) {
-                    callableMethods.add(method);
+                if (ReflectionUtil.matchesArguments(method, arguments)) {
+                    matchingMethods.add(method);
                 }
             }
         }
 
-        if (callableMethods.size() == 0) {
+        if (matchingMethods.size() == 0) {
             throw new ScriptException("No method '" + methodName + "' with matching arguments found");
         }
-        if (callableMethods.size() > 1) {
-            throw new ScriptException("No method '" + methodName + "' with matching arguments found: " + callableMethods.size());
+        if (matchingMethods.size() > 1) {
+            throw new ScriptException("Ambiguous methods '" + methodName + "' with matching arguments found: " + matchingMethods.size());
         }
 
-        return byMethod(callableMethods.get(0), arguments);
+        return byMethod(matchingMethods.get(0), arguments);
     }
 
-    private static boolean matchesArguments(Method method, Object[] arguments) {
-        Class<?>[] parameterTypes = method.getParameterTypes();
-        if (arguments.length != parameterTypes.length) {
-            return false;
-        }
-
-        for (int i = 0; i < arguments.length; i++) {
-            if (arguments[i] == null) {
-                if (parameterTypes[i].isPrimitive()) {
-                    return false;
-                }
-            } else {
-                Class<?> argumentType = arguments[i].getClass();
-                if (!matchesType(parameterTypes[i], argumentType)) {
-                    return false;
-                }
-            }
-        }
-
-        return true;
-    }
-
-    private static boolean matchesType(Class<?> parameterType, Class<?> argumentType) {
-        if ((parameterType == int.class && argumentType == Integer.class) ||
-                (parameterType == long.class && argumentType == Long.class) ||
-                (parameterType == short.class && argumentType == Short.class) ||
-                (parameterType == byte.class && argumentType == Byte.class) ||
-                (parameterType == boolean.class && argumentType == Boolean.class) ||
-                (parameterType == float.class && argumentType == Float.class) ||
-                (parameterType == double.class && argumentType == Double.class) ||
-                (parameterType == char.class && argumentType == Character.class)) {
-            return true;
-        }
-        return parameterType.isAssignableFrom(argumentType);
-    }
 }

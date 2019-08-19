@@ -16,7 +16,7 @@ import java.util.stream.Collectors;
 
 public class JavaScriptEngine implements ScriptEngine, Compilable {
 
-    private ConstructorStrategy constructorStrategy = new DefaultConstructorStrategy();
+    private ConstructorStrategy constructorStrategy = DefaultConstructorStrategy.byDefaultConstructor();
     private ExecutionStrategyFactory executionStrategyFactory = (clazz) -> new AutoExecutionStrategy(clazz);
 
     private ScriptContext context = new SimpleScriptContext();

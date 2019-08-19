@@ -2,6 +2,7 @@ package ch.obermuhlner.scriptengine.example;
 
 import ch.obermuhlner.scriptengine.java.JavaCompiledScript;
 import ch.obermuhlner.scriptengine.java.JavaScriptEngine;
+import ch.obermuhlner.scriptengine.java.constructor.DefaultConstructorStrategy;
 import ch.obermuhlner.scriptengine.java.execution.MethodExecutionStrategy;
 
 import javax.script.*;
@@ -12,11 +13,12 @@ public class ScriptEngineExample {
     }
 
     private static void runExamples() {
-        //runHelloWorldExample();
-        //runCompileHelloWorldExample();
-        //runCompileEngineBindingsExample();
-        //runCompileGlobalBindingsExample();
-        //runMethodExecutionStrategyFactoryMatchingArgumentsExample();
+        runHelloWorldExample();
+        runCompileHelloWorldExample();
+        runCompileEngineBindingsExample();
+        runCompileGlobalBindingsExample();
+        runConstructorStrategyMatchingArgumentsExample();
+        runMethodExecutionStrategyFactoryMatchingArgumentsExample();
         runCompiledMethodExecutionStrategyMatchingArgumentsExample();
     }
 
@@ -152,6 +154,34 @@ public class ScriptEngineExample {
             e.printStackTrace();
         }
     }
+
+    private static void runConstructorStrategyMatchingArgumentsExample() {
+        try {
+            ScriptEngineManager manager = new ScriptEngineManager();
+            ScriptEngine engine = manager.getEngineByName("java");
+            JavaScriptEngine javaScriptEngine = (JavaScriptEngine) engine;
+
+            javaScriptEngine.setConstructorStrategy(DefaultConstructorStrategy.byMatchingArguments("Hello", 42));
+
+            Object result = engine.eval("" +
+                    "public class Script {" +
+                    "   private final String message;" +
+                    "   private final int value;" +
+                    "   public Script(String message, int value) {" +
+                    "       this.message = message;" +
+                    "       this.value = value;" +
+                    "   }" +
+                    "   public String getMessage() {" +
+                    "       return \"Message: \" + message + value;" +
+                    "   }" +
+                    "}");
+
+            System.out.println("Result: " + result);
+        } catch (ScriptException e) {
+            e.printStackTrace();
+        }
+    }
+
 
     private static void runMethodExecutionStrategyFactoryMatchingArgumentsExample() {
         try {
