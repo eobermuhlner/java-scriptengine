@@ -11,6 +11,9 @@ addons:
     token:
       secure: CEJ5KV9LrTVLS+eIvH+r78TrIqxfveslqYC4GL3qJ6rvjlkDn7mhTw0e5peqg2Syb61ZyscdkzAYZ3M7NkIw1bBHuLr/XBIW8FY6gwTuSxNkAkLQ0YKDXbENxve9lwJ4LtcNTqBMYjta3tCCuhWGKnMiTv+5ga4p+PWEeKJXkiL+lDgV4/VRya4omaF/8TfMi4WpdiOG09vQwqg9TOl5vgr+AX71zQ8l8AxW4hKdA7ofadgLcSBvspJs7cv/sdkXMG4gw405PvlK27JIWlvlX/Sc2zRRYkso1k6LgwavcetGneN2DyOCpuqtwd9ORQWjlPq1hpEN8fZpgEJTc4JfXtk5eA2qF72m9zcaua12diJwfvQt1z7gIaabkZVeQFMNRjLZVREAdNR/0MChIB0BR90aPA2O1XP7bJwEzLdf4YehtRdpHgZav6jh84+8qxNwsZkNFz/MymMFzlysIJVfylPXZYdeokuNGoFXWJfnS5shHmNwBQQHsCK9+KzuO3nymE0dMqQXjB4NJGPXrE84WAG2bp+BQJjfiPB8VrBP/e9KhlvqmF58Q2BteV8ftVWERe9CoIFwWpkjKfkDUx72PK1vcpOPYLNWlAmz56A4ao+fLJnl4taHlgvodVdatw3vm2BZ5BIQkX2SxnBRaaD26x+U4+oLl/IHCsNIhZl5DlE=
 
+script:
+  - ./gradlew sonarqube
+
 after_success:
   - bash <(curl -s https://codecov.io/bash)
 
