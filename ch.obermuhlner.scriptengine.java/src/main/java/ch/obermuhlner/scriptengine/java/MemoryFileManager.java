@@ -35,12 +35,10 @@ import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
-import java.util.stream.Collectors;
 
 import javax.tools.JavaFileObject.Kind;
 
 import static javax.tools.StandardLocation.CLASS_OUTPUT;
-import static javax.tools.StandardLocation.CLASS_PATH;
 import javax.tools.FileObject;
 import javax.tools.JavaFileManager;
 import javax.tools.JavaFileObject;
@@ -270,7 +268,7 @@ public class MemoryFileManager implements JavaFileManager {
     /**
      * Infers a binary name of a file object based on a location.  The
      * binary name returned might not be a valid binary name according to
-     * <cite>The Java&trade {        throw new UnsupportedOperationException("Not supported yet.");  } Language Specification</cite>.
+     * <cite>The Java Language Specification</cite>.
      *
      * @param location a location
      * @param file a file object
