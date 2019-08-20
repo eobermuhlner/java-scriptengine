@@ -55,11 +55,11 @@ public class DefaultConstructorStrategy implements ConstructorStrategy {
             }
         }
 
-        if (matchingConstructors.size() == 0) {
+        int count = matchingConstructors.size();
+        if (count == 0) {
             throw new ScriptException("No constructor with matching arguments found");
-        }
-        if (matchingConstructors.size() > 1) {
-            throw new ScriptException("Ambiguous constructors with matching arguments found: " + matchingConstructors.size());
+        } else if (count > 1) {
+            throw new ScriptException("Ambiguous constructors with matching arguments found: " + count);
         }
 
         return matchingConstructors.get(0);

@@ -50,11 +50,11 @@ public class MethodExecutionStrategy implements ExecutionStrategy {
             }
         }
 
-        if (matchingMethods.size() == 0) {
+        int count = matchingMethods.size();
+        if (count == 0) {
             throw new ScriptException("No method '" + methodName + "' with matching arguments found");
-        }
-        if (matchingMethods.size() > 1) {
-            throw new ScriptException("Ambiguous methods '" + methodName + "' with matching arguments found: " + matchingMethods.size());
+        } else if (count > 1) {
+            throw new ScriptException("Ambiguous methods '" + methodName + "' with matching arguments found: " + count);
         }
 
         return byMethod(matchingMethods.get(0), arguments);
