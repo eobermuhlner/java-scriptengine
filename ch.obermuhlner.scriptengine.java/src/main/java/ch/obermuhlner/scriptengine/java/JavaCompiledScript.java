@@ -4,6 +4,7 @@ import ch.obermuhlner.scriptengine.java.execution.ExecutionStrategy;
 
 import javax.script.*;
 import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -56,9 +57,8 @@ public class JavaCompiledScript extends CompiledScript {
             String name = entry.getKey();
             Object value = entry.getValue();
 
-            Class<?> clazz = instance.getClass();
             try {
-                Field field = clazz.getField(name);
+                Field field = instanceClass.getField(name);
                 field.set(instance, value);
             } catch (NoSuchFieldException | IllegalAccessException e) {
                 throw new ScriptException(e);
@@ -67,9 +67,7 @@ public class JavaCompiledScript extends CompiledScript {
     }
 
     private void pullVariables(Bindings globalBindings, Bindings engineBindings) throws ScriptException {
-        Class<?> clazz = instance.getClass();
-
-        for (Field field : clazz.getFields()) {
+        for (Field field : instanceClass.getFields()) {
             try {
                 String name = field.getName();
                 Object value = field.get(instance);
