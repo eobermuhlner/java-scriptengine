@@ -48,10 +48,8 @@ public class DefaultConstructorStrategy implements ConstructorStrategy {
 
         List<Constructor<?>> matchingConstructors = new ArrayList<>();
         for (Constructor<?> constructor : clazz.getConstructors()) {
-            if (Modifier.isPublic(constructor.getModifiers())) {
-                if (ReflectionUtil.matchesArguments(constructor, arguments)) {
-                    matchingConstructors.add(constructor);
-                }
+            if (Modifier.isPublic(constructor.getModifiers()) && ReflectionUtil.matchesArguments(constructor, arguments)) {
+                matchingConstructors.add(constructor);
             }
         }
 

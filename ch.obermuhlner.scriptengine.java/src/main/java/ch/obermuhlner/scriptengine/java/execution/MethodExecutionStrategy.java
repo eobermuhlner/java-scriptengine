@@ -43,10 +43,10 @@ public class MethodExecutionStrategy implements ExecutionStrategy {
     public static MethodExecutionStrategy byMatchingArguments(Class<?> clazz, String methodName, Object... arguments) throws ScriptException {
         List<Method> matchingMethods = new ArrayList<>();
         for (Method method : clazz.getMethods()) {
-            if (method.getName().equals(methodName) && (method.getModifiers() & Modifier.PUBLIC) != 0) {
-                if (ReflectionUtil.matchesArguments(method, arguments)) {
-                    matchingMethods.add(method);
-                }
+            if (method.getName().equals(methodName)
+                    && (method.getModifiers() & Modifier.PUBLIC) != 0
+                    && ReflectionUtil.matchesArguments(method, arguments)) {
+                matchingMethods.add(method);
             }
         }
 
