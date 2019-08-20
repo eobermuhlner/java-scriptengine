@@ -37,14 +37,14 @@ public class ReflectionUtil {
     }
 
     public static boolean matchesType(Class<?> parameterType, Class<?> argumentType) {
-        if ((parameterType == int.class && argumentType == Integer.class) ||
-                (parameterType == long.class && argumentType == Long.class) ||
-                (parameterType == short.class && argumentType == Short.class) ||
-                (parameterType == byte.class && argumentType == Byte.class) ||
-                (parameterType == boolean.class && argumentType == Boolean.class) ||
-                (parameterType == float.class && argumentType == Float.class) ||
-                (parameterType == double.class && argumentType == Double.class) ||
-                (parameterType == char.class && argumentType == Character.class)) {
+        if ((parameterType == int.class && argumentType == Integer.class)
+                || (parameterType == long.class && argumentType == Long.class)
+                || (parameterType == short.class && argumentType == Short.class)
+                || (parameterType == byte.class && argumentType == Byte.class)
+                || (parameterType == boolean.class && argumentType == Boolean.class)
+                || (parameterType == float.class && argumentType == Float.class)
+                || (parameterType == double.class && argumentType == Double.class)
+                || (parameterType == char.class && argumentType == Character.class)) {
             return true;
         }
         return parameterType.isAssignableFrom(argumentType);
