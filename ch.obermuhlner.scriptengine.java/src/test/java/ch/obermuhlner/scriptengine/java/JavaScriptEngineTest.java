@@ -331,6 +331,42 @@ public class JavaScriptEngineTest {
     }
 
     @Test
+    public void failBindingsPrivate() {
+        ScriptEngineManager manager = new ScriptEngineManager();
+        ScriptEngine engine = manager.getEngineByName("java");
+
+        engine.put("message", "Hello");
+
+        assertThatThrownBy(() -> {
+            engine.eval("" +
+                    "public class Script {" +
+                    "   private String message;" +
+                    "   public String getMessage() {" +
+                    "       return message;" +
+                    "   }" +
+                    "}");
+        }).isInstanceOf(ScriptException.class);
+    }
+
+    @Test
+    public void failBindingsStaticPrivate() {
+        ScriptEngineManager manager = new ScriptEngineManager();
+        ScriptEngine engine = manager.getEngineByName("java");
+
+        engine.put("message", "Hello");
+
+        assertThatThrownBy(() -> {
+            engine.eval("" +
+                    "public class Script {" +
+                    "   private static String message;" +
+                    "   public String getMessage() {" +
+                    "       return message;" +
+                    "   }" +
+                    "}");
+        }).isInstanceOf(ScriptException.class);
+    }
+
+    @Test
     public void testGlobalBindings() throws ScriptException {
         ScriptEngineManager manager = new ScriptEngineManager();
         manager.put("message", "Hello");
