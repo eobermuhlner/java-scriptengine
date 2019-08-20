@@ -73,6 +73,15 @@ public class DefaultConstructorStrategyTest {
         }).isInstanceOf(ScriptException.class);
     }
 
+    @Test
+    public void failThrowException() throws ScriptException {
+        DefaultConstructorStrategy constructorStrategy = DefaultConstructorStrategy.byMatchingArguments(
+                new RuntimeException("some reason"));
+        assertThatThrownBy(() -> {
+            constructorStrategy.construct(TestConstructor.class);
+        }).isInstanceOf(ScriptException.class);
+    }
+
     public static class TestConstructor {
         public String message;
         public TestConstructor() {
@@ -105,6 +114,9 @@ public class DefaultConstructorStrategyTest {
                     floatValue + "," +
                     doubleValue + "," +
                     charValue + ")";
+        }
+        public TestConstructor(RuntimeException exception) {
+            throw exception;
         }
     }
 }

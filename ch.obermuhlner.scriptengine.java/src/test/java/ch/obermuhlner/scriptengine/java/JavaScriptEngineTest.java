@@ -311,6 +311,49 @@ public class JavaScriptEngineTest {
     }
 
     @Test
+    public void testBindings() throws ScriptException {
+        ScriptEngineManager manager = new ScriptEngineManager();
+        ScriptEngine engine = manager.getEngineByName("java");
+
+        engine.put("message", "Hello");
+        engine.put("counter", 42);
+
+        Object result = engine.eval("" +
+                "public class Script {" +
+                "   public static String message;" +
+                "   public int counter;" +
+                "   public String getMessage() {" +
+                "       return message + counter++;" +
+                "   }" +
+                "}");
+        assertThat(result).isEqualTo("Hello42");
+        assertThat(engine.get("counter")).isEqualTo(43);
+    }
+
+    @Test
+    public void testGlobalBindings() throws ScriptException {
+        ScriptEngineManager manager = new ScriptEngineManager();
+        manager.put("message", "Hello");
+        manager.put("counter", 42);
+
+        ScriptEngine engine = manager.getEngineByName("java");
+
+        Object result = engine.eval("" +
+                "public class Script {" +
+                "   public static String message;" +
+                "   public int counter;" +
+                "   public String getMessage() {" +
+                "       return message + counter++;" +
+                "   }" +
+                "}");
+        assertThat(result).isEqualTo("Hello42");
+        assertThat(manager.get("counter")).isEqualTo(43);
+        assertThat(engine.get("counter")).isNull();
+        assertThat(engine.getBindings(ScriptContext.ENGINE_SCOPE).get("counter")).isNull();
+        assertThat(engine.getBindings(ScriptContext.GLOBAL_SCOPE).get("counter")).isEqualTo(43);
+    }
+
+    @Test
     public void testCompilable() throws ScriptException {
         ScriptEngineManager manager = new ScriptEngineManager();
         ScriptEngine engine = manager.getEngineByName("java");
@@ -324,6 +367,42 @@ public class JavaScriptEngineTest {
                 "       return \"Message: \" + message + counter++;" +
                 "   }" +
                 "}";
+
+        Compilable compiler = (Compilable) engine;
+        CompiledScript compiledScript = compiler.compile(script);
+        assertThat(compiledScript.getEngine()).isSameAs(engine);
+
+        JavaCompiledScript javaCompiledScript = (JavaCompiledScript) compiledScript;
+        assertThat(javaCompiledScript.getInstanceClass().getName()).isEqualTo("CompiledScript");
+        assertThat(javaCompiledScript.getInstance()).isNotNull();
+        assertThat(javaCompiledScript.getInstance().getClass().getName()).isEqualTo("CompiledScript");
+
+        for (int i = 0; i < 2; i++) {
+            Bindings bindings = engine.createBindings();
+
+            bindings.put("message", "Hello-");
+            bindings.put("counter", i);
+            Object result = compiledScript.eval(bindings);
+
+            assertThat(result).isEqualTo("Message: Hello-" + i);
+            assertThat(bindings.get("counter")).isEqualTo(i + 1);
+        }
+    }
+
+    @Test
+    public void testCompilableReader() throws ScriptException {
+        ScriptEngineManager manager = new ScriptEngineManager();
+        ScriptEngine engine = manager.getEngineByName("java");
+        assertThat(engine).isInstanceOf(Compilable.class);
+
+        StringReader script = new StringReader("" +
+                "public class CompiledScript {" +
+                "   public static String message;" +
+                "   public int counter;" +
+                "   public String getMessage() {" +
+                "       return \"Message: \" + message + counter++;" +
+                "   }" +
+                "}");
 
         Compilable compiler = (Compilable) engine;
         CompiledScript compiledScript = compiler.compile(script);

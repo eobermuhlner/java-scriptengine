@@ -64,6 +64,15 @@ public class DefaultExecutionStrategyTest {
         }).isInstanceOf(ScriptException.class);
     }
 
+    @Test
+    public void testThrowExceptionExecution() {
+        DefaultExecutionStrategy executionStrategy = new DefaultExecutionStrategy(TestThrowExceptionExecution.class);
+        TestThrowExceptionExecution instance = new TestThrowExceptionExecution();
+        assertThatThrownBy(() -> {
+            executionStrategy.execute(instance);
+        }).isInstanceOf(ScriptException.class);
+    }
+
     public static class TestSupplierExecution implements Supplier<String> {
         @Override
         public String get() {
@@ -100,6 +109,12 @@ public class DefaultExecutionStrategyTest {
         }
         public String getFailure2() {
             return "failure2";
+        }
+    }
+
+    public static class TestThrowExceptionExecution {
+        public void throwException() {
+            throw new RuntimeException("some reason");
         }
     }
 }
