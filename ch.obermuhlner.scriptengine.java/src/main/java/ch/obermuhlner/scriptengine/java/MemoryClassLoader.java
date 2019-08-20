@@ -1,8 +1,5 @@
 package ch.obermuhlner.scriptengine.java;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.Map;
 
 public class MemoryClassLoader extends ClassLoader {
