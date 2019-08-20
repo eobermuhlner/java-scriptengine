@@ -6,7 +6,7 @@ public interface NameStrategy {
     String getFullName(String script) throws ScriptException;
 
     static String extractSimpleName(String fullName) {
-        int lastDotIndex = fullName.lastIndexOf(".");
+        int lastDotIndex = fullName.lastIndexOf('.');
         if (lastDotIndex < 0) {
             return fullName;
         }
@@ -14,7 +14,7 @@ public interface NameStrategy {
     }
 
     static String extractPackageName(String fullName) {
-        int lastDotIndex = fullName.lastIndexOf(".");
+        int lastDotIndex = fullName.lastIndexOf('.');
         if (lastDotIndex < 0) {
             return "";
         }
