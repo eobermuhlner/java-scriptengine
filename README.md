@@ -118,9 +118,9 @@ Result1: Hello World #1
 Result2: Hello World #2
 ```
 
-## Bindings instance variables (fields) 
+## Binding variables 
 
-You can read and write variables, both instance variables (fields) and static variables,
+You can read and write `public` variables, both instance variables (fields) and static variables,
 by using `Bindings` in the script engine.
 
 ```java
@@ -177,7 +177,7 @@ Variable2 counter: 3
 ## Advanced features of `JavaScriptEngine`
 
 The `JavaScriptEngine` has an additional API to control
-the execution of the script class.
+the creation and execution of the script class.
 
 ### Set `NameStrategy` in `JavaScriptEngine` 
 
@@ -211,7 +211,7 @@ public interface ConstructorStrategy {
 The default implementation `DefaultConstructorStrategy`
 uses the no-argument default constructor.
 
-Additional static constructor methods `DefaultConstructorStrategy`
+Additional static constructor methods in `DefaultConstructorStrategy`
 allow to use a constructor with explicit arguments.
 
 The following example uses the
@@ -244,6 +244,12 @@ try {
     e.printStackTrace();
 }
 ```
+
+The matching algorithm in `DefaultConstructorStrategy.byMatchingArguments()`
+will ignore `null` arguments for non-primitive argument types.
+
+If the algorithm finds more than one matching constructor a `ScriptException` is thrown.
+
 
 ### Set `ExecutionStrategyFactory` in `JavaScriptEngine`
 
@@ -310,6 +316,11 @@ The console output shows that `getMessage("Hello", 42)` was called.
 ```console
 Result: Message: Hello42
 ```
+
+The matching algorithm in `MethodExecutionStrategy.byMatchingArguments()`
+will ignore `null` arguments for non-primitive argument types.
+
+If the algorithm finds more than one matching method a `ScriptException` is thrown.
 
 ### Set `ExecutionStrategy` in `JavaCompiledScript`
 
