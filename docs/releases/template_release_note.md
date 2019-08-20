@@ -18,6 +18,6 @@ Added `Example.method(y)`
 # Examples
 
 Note: The example code is available on github, but not part of the
-`jshell-scriptengine` library.
+`java-scriptengine` library.
 
 No changes in the examples.
