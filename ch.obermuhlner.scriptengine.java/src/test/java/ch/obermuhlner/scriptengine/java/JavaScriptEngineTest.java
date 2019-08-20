@@ -1,6 +1,7 @@
 package ch.obermuhlner.scriptengine.java;
 
 import ch.obermuhlner.scriptengine.java.constructor.DefaultConstructorStrategy;
+import ch.obermuhlner.scriptengine.java.constructor.NullConstructorStrategy;
 import ch.obermuhlner.scriptengine.java.execution.MethodExecutionStrategy;
 import ch.obermuhlner.scriptengine.java.name.FixNameStrategy;
 import org.junit.Ignore;
@@ -308,6 +309,27 @@ public class JavaScriptEngineTest {
                 "   }" +
                 "}");
         assertThat(result).isEqualTo("Message: Hello42");
+    }
+
+    @Test
+    public void testConstructorNull() throws ScriptException {
+        ScriptEngineManager manager = new ScriptEngineManager();
+        ScriptEngine engine = manager.getEngineByName("java");
+        JavaScriptEngine javaScriptEngine = (JavaScriptEngine) engine;
+
+        javaScriptEngine.setConstructorStrategy(new NullConstructorStrategy());
+
+        Object result = engine.eval("" +
+                "public class Script {" +
+                "   private static String message = \"Unknown\";" +
+                "   private static int value = 99;" +
+                "   private Script() {" +
+                "   }" +
+                "   public static String getMessage() {" +
+                "       return \"Message: \" + message + value;" +
+                "   }" +
+                "}");
+        assertThat(result).isEqualTo("Message: Unknown99");
     }
 
     @Test

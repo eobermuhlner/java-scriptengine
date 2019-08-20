@@ -11,15 +11,24 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 public class DefaultExecutionStrategyTest {
 
     @Test
-    public void testNullExecution() throws ScriptException {
-        DefaultExecutionStrategy executionStrategy = new DefaultExecutionStrategy(TestSupplierExecution.class);
+    public void testStaticMethodDefaultExecution() throws ScriptException {
+        DefaultExecutionStrategy executionStrategy = new DefaultExecutionStrategy(TestStaticMethodExecution.class);
         Object result = executionStrategy.execute(null);
 
-        assertThat(result).isNull();
+        assertThat(result).isEqualTo("static success");
     }
 
     @Test
-    public void testSupplierExecution() throws ScriptException {
+    public void failStaticMethodDefaultExecution() throws ScriptException {
+        DefaultExecutionStrategy executionStrategy = new DefaultExecutionStrategy(TestSupplierExecution.class);
+
+        assertThatThrownBy(() -> {
+            executionStrategy.execute(null);
+        }).isInstanceOf(ScriptException.class);
+    }
+
+    @Test
+    public void testSupplierDefaultExecution() throws ScriptException {
         DefaultExecutionStrategy executionStrategy = new DefaultExecutionStrategy(TestSupplierExecution.class);
         TestSupplierExecution instance = new TestSupplierExecution();
         Object result = executionStrategy.execute(instance);
@@ -28,7 +37,7 @@ public class DefaultExecutionStrategyTest {
     }
 
     @Test
-    public void testRunnableExecution() throws ScriptException {
+    public void testRunnableDefaultExecution() throws ScriptException {
         DefaultExecutionStrategy executionStrategy = new DefaultExecutionStrategy(TestRunnableExecution.class);
         TestRunnableExecution instance = new TestRunnableExecution();
         Object result = executionStrategy.execute(instance);
@@ -38,7 +47,7 @@ public class DefaultExecutionStrategyTest {
     }
 
     @Test
-    public void testMethodExecution() throws ScriptException {
+    public void testMethodDefaultExecution() throws ScriptException {
         DefaultExecutionStrategy executionStrategy = new DefaultExecutionStrategy(TestMethodExecution.class);
         TestMethodExecution instance = new TestMethodExecution();
         Object result = executionStrategy.execute(instance);
@@ -47,7 +56,7 @@ public class DefaultExecutionStrategyTest {
     }
 
     @Test
-    public void testNoMethodExecution() {
+    public void testNoMethodDefaultExecution() {
         DefaultExecutionStrategy executionStrategy = new DefaultExecutionStrategy(TestNoMethodExecution.class);
         TestNoMethodExecution instance = new TestNoMethodExecution();
         assertThatThrownBy(() -> {
@@ -56,7 +65,7 @@ public class DefaultExecutionStrategyTest {
     }
 
     @Test
-    public void testAmbiguousMethodExecution() {
+    public void testAmbiguousMethodDefaultExecution() {
         DefaultExecutionStrategy executionStrategy = new DefaultExecutionStrategy(TestAmbiguousMethodExecution.class);
         TestAmbiguousMethodExecution instance = new TestAmbiguousMethodExecution();
         assertThatThrownBy(() -> {
@@ -65,12 +74,28 @@ public class DefaultExecutionStrategyTest {
     }
 
     @Test
-    public void testThrowExceptionExecution() {
+    public void testThrowExceptionDefaultExecution() {
         DefaultExecutionStrategy executionStrategy = new DefaultExecutionStrategy(TestThrowExceptionExecution.class);
         TestThrowExceptionExecution instance = new TestThrowExceptionExecution();
         assertThatThrownBy(() -> {
             executionStrategy.execute(instance);
         }).isInstanceOf(ScriptException.class);
+    }
+
+    public static class TestStaticMethodExecution {
+        private TestStaticMethodExecution() {
+        }
+
+        public String getFailure(int value) {
+            return "failure-" + value;
+        }
+
+        public static String getStaticSuccess() {
+            return "static success";
+        }
+        public static String getStaticFailure(int value) {
+            return "static failure-" + value;
+        }
     }
 
     public static class TestSupplierExecution implements Supplier<String> {

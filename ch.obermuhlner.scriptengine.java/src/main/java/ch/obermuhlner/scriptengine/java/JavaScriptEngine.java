@@ -20,7 +20,7 @@ public class JavaScriptEngine implements ScriptEngine, Compilable {
 
     private NameStrategy nameStrategy = new DefaultNameStrategy();
     private ConstructorStrategy constructorStrategy = DefaultConstructorStrategy.byDefaultConstructor();
-    private ExecutionStrategyFactory executionStrategyFactory = (clazz) -> new DefaultExecutionStrategy(clazz);
+    private ExecutionStrategyFactory executionStrategyFactory = clazz -> new DefaultExecutionStrategy(clazz);
 
     private ScriptContext context = new SimpleScriptContext();
 

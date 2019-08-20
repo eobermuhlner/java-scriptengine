@@ -10,18 +10,16 @@ import java.util.function.Supplier;
 
 public class DefaultExecutionStrategy implements ExecutionStrategy {
 
+    private final Class<?> clazz;
     private final Method method;
 
     public DefaultExecutionStrategy(Class<?> clazz) {
         method = findCallableMethod(clazz);
+        this.clazz = clazz;
     }
 
     @Override
     public Object execute(Object instance) throws ScriptException {
-        if (instance == null) {
-            return null;
-        }
-
         if (instance instanceof Supplier) {
             Supplier supplier = (Supplier) instance;
             return supplier.get();
@@ -41,7 +39,10 @@ public class DefaultExecutionStrategy implements ExecutionStrategy {
             }
         }
 
-        throw new ScriptException("No method found to execute instance of type: " + instance.getClass());
+        if (instance == null) {
+            throw new ScriptException("No static method found to execute of type " + clazz.getName());
+        }
+        throw new ScriptException("No method found to execute instance of type " + clazz.getName());
     }
 
     private static Method findCallableMethod(Class<?> clazz) {
