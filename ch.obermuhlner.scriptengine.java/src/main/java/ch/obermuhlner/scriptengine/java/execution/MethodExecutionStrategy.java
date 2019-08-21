@@ -9,6 +9,8 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.StringJoiner;
+import java.util.stream.Collectors;
 
 /**
  * The {@link ExecutionStrategy} that executes a specific method.
@@ -102,7 +104,8 @@ public class MethodExecutionStrategy implements ExecutionStrategy {
         if (count == 0) {
             throw new ScriptException("No method '" + methodName + "' with matching arguments found");
         } else if (count > 1) {
-            throw new ScriptException("Ambiguous methods '" + methodName + "' with matching arguments found: " + count);
+            throw new ScriptException("Ambiguous methods '" + methodName + "' with matching arguments found: " + "\n" +
+                    matchingMethods.stream().map(Object::toString).collect(Collectors.joining("\n")));
         }
 
         return byMethod(matchingMethods.get(0), arguments);

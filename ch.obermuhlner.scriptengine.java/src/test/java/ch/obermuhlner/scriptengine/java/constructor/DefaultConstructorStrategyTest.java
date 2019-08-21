@@ -82,7 +82,7 @@ public class DefaultConstructorStrategyTest {
         }).isInstanceOf(ScriptException.class);
     }
 
-    public static class TestConstructor {
+    private static class TestConstructor {
         public String message;
         public TestConstructor() {
             message = "TestConstructor()";
@@ -115,7 +115,7 @@ public class DefaultConstructorStrategyTest {
                     doubleValue + "," +
                     charValue + ")";
         }
-        public TestConstructor(RuntimeException exception) {
+        private TestConstructor(RuntimeException exception) {
             throw exception;
         }
     }

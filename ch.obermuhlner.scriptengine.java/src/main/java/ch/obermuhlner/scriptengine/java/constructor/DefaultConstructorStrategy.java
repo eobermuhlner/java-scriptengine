@@ -8,6 +8,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * The default {@link ConstructorStrategy} implementation.
@@ -97,7 +98,8 @@ public class DefaultConstructorStrategy implements ConstructorStrategy {
         if (count == 0) {
             throw new ScriptException("No constructor with matching arguments found");
         } else if (count > 1) {
-            throw new ScriptException("Ambiguous constructors with matching arguments found: " + count);
+            throw new ScriptException("Ambiguous constructors with matching arguments found:\n" +
+                    matchingConstructors.stream().map(Object::toString).collect(Collectors.joining("\n")));
         }
 
         return matchingConstructors.get(0);
