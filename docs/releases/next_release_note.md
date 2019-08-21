@@ -18,6 +18,13 @@ Using a `NullConstructorStrategy` is the most convenient way to do this.
 MethodExecutionStrategy.byMatchingArguments() is supposed to search for
 a method with the specified methodName, but the name was actually ignored.
 
+## Engine version
+
+The `JavaScriptEngineFactory.getEngineVersion()` of release 1.0.0 
+reported a wrong version "0.0.1". 
+
+The new release reports the now correct version "1.0.1".
+
 
 # Enhancements
 
@@ -40,9 +47,14 @@ public java.lang.String ch.obermuhlner.scriptengine.java.execution.MethodExecuti
 public java.lang.String ch.obermuhlner.scriptengine.java.execution.MethodExecutionStrategyTest$TestMethod.doSomething(java.lang.String,java.lang.String,int)
 ```
 
+## Javadoc
+
+Javadoc was written for all public classes.
+
 # Examples
 
 Note: The example code is available on github, but not part of the
 `java-scriptengine` library.
 
-No changes in the examples.
+All of the example code in this documentation is runnable
+in the class `ScriptEngineExample`.

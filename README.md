@@ -10,7 +10,7 @@
 The `java-scriptengine` (not to be confused with a `javascript` script engine)
 compiles and executes `Java` files at runtime.
 
-The script source is a standard Java class that must follow these rules:
+The script source is a standard Java class that out of the box must follow these rules:
 * public class
 * constructor with no arguments (default constructor)
 * Callable entry point. One of the following:
