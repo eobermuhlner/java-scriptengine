@@ -4,6 +4,9 @@ import javax.script.ScriptException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+/**
+ * A {@link NameStrategy} that scans the Java script to determine the package name and class name defined in the script.
+ */
 public class DefaultNameStrategy implements NameStrategy {
     private static final Pattern NAME_PATTERN = Pattern.compile("public\\s+class\\s+([A-Za-z][A-Za-z0-9_$]*)");
     private static final Pattern PACKAGE_PATTERN = Pattern.compile("package\\s+([A-Za-z][A-Za-z0-9_$.]*)");

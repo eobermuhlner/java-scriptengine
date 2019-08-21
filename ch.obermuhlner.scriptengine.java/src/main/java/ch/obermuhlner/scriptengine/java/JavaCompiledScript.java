@@ -4,16 +4,28 @@ import ch.obermuhlner.scriptengine.java.execution.ExecutionStrategy;
 
 import javax.script.*;
 import java.lang.reflect.Field;
-import java.lang.reflect.Modifier;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * The compiled Java script created by a {@link JavaScriptEngine}.
+ */
 public class JavaCompiledScript extends CompiledScript {
     private final JavaScriptEngine engine;
     private final Class<?> instanceClass;
     private final Object instance;
     private ExecutionStrategy executionStrategy;
 
+    /**
+     * Construct a {@link JavaCompiledScript}.
+     *
+     * @param engine the {@link JavaScriptEngine} that compiled this script
+     * @param instanceClass the compiled {@link Class}
+     * @param instance the instance of the compiled {@link Class} or {@code null}
+     *                 if no instance was created and only static methods will be called
+     *                 by the the {@link ExecutionStrategy}.
+     * @param executionStrategy the {@link ExecutionStrategy}
+     */
     JavaCompiledScript(JavaScriptEngine engine, Class<?> instanceClass, Object instance, ExecutionStrategy executionStrategy) {
         this.engine = engine;
         this.instanceClass = instanceClass;
@@ -21,14 +33,31 @@ public class JavaCompiledScript extends CompiledScript {
         this.executionStrategy = executionStrategy;
     }
 
+    /**
+     * Returns the compiled {@link Class}.
+     *
+     * @return the compiled {@link Class}.
+     */
     public Class<?> getInstanceClass() {
         return instanceClass;
     }
 
+    /**
+     * Returns the instance of the compiled {@link Class}.
+     *
+     * @return the instance of the compiled {@link Class} or {@code null}
+     *         if no instance was created and only static methods will be called
+     *         by the the {@link ExecutionStrategy}.
+     */
     public Object getInstance() {
         return instance;
     }
 
+    /**
+     * Sets the {@link ExecutionStrategy} to be used when evaluating the compiled class instance.
+     *
+     * @param executionStrategy the {@link ExecutionStrategy}
+     */
     public void setExecutionStrategy(ExecutionStrategy executionStrategy) {
         this.executionStrategy = executionStrategy;
     }

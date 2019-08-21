@@ -9,6 +9,18 @@ import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * The default {@link ConstructorStrategy} implementation.
+ *
+ * This implementation has three static constructor methods to define the constructor that should be called:
+ * <ul>
+ *      <li>{@link #byDefaultConstructor()} to call the public default no-argument constructor.</li>
+ *      <li>{@link #byArgumentTypes(Class[], Object...)} to call the public constructor with the
+ *      specified argument types and pass it the specified arguments.</li>
+ *      <li>{@link #byMatchingArguments(Object...)} to call a public constructor that matches the
+ *      specified arguments.</li>
+ * </ul>
+ */
 public class DefaultConstructorStrategy implements ConstructorStrategy {
 
     private Class<?>[] argumentTypes;
@@ -29,14 +41,42 @@ public class DefaultConstructorStrategy implements ConstructorStrategy {
         }
     }
 
+    /**
+     * Creates a {@link DefaultConstructorStrategy} that will call the public default no-argument constructor.
+     *
+     * @return the created {@link DefaultConstructorStrategy}
+     */
     public static DefaultConstructorStrategy byDefaultConstructor() {
         return new DefaultConstructorStrategy(new Class<?>[0], new Object[0]);
     }
 
+    /**
+     * Creates a {@link DefaultConstructorStrategy} that will call the public constructor with the
+     * specified argument types and passes the specified argument list.
+     *
+     * @param argumentTypes the argument types defining the constructor to call
+     * @param arguments the arguments to pass to the constructor (may contain {@code null})
+     * @return the created {@link DefaultConstructorStrategy}
+     */
     public static DefaultConstructorStrategy byArgumentTypes(Class<?>[] argumentTypes, Object... arguments) {
         return new DefaultConstructorStrategy(argumentTypes, arguments);
     }
 
+    /**
+     * Creates a {@link DefaultConstructorStrategy} that will call a public constructor that matches the
+     * specified arguments.
+     *
+     * A constructor must match all specified arguments, except {@code null} values which
+     * match any non-primitive type.
+     * The conversion from object types into corresponding primitive types
+     * (for example {@link Integer} into {@code int}) is handled automatically.
+     *
+     * If multiple public constructors match the specified arguments the
+     * {@link #construct(Class)} method will throw a {@link ScriptException}.
+     *
+     * @param arguments the arguments to pass to the constructor (may contain {@code null})
+     * @return the created {@link DefaultConstructorStrategy}
+     */
     public static DefaultConstructorStrategy byMatchingArguments(Object... arguments) {
         return new DefaultConstructorStrategy(null, arguments);
     }

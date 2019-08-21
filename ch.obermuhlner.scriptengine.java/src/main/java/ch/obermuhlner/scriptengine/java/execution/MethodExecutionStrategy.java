@@ -1,5 +1,6 @@
 package ch.obermuhlner.scriptengine.java.execution;
 
+import ch.obermuhlner.scriptengine.java.constructor.DefaultConstructorStrategy;
 import ch.obermuhlner.scriptengine.java.internal.ReflectionUtil;
 
 import javax.script.ScriptException;
@@ -9,6 +10,20 @@ import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * The {@link ExecutionStrategy} that executes a specific method.
+ *
+ * This implementation has three static constructor methods to define the method that should be called:
+ * <ul>
+ *      <li>{@link #byMethod(Method, Object...)}
+ *      to call the specified method and pass it the specified arguments.</li>
+ *      <li>{@link #byArgumentTypes(Class, String, Class[], Object...)}
+ *      to call the public method with the
+ *      specified argument types and pass it the specified arguments.</li>
+ *      <li>{@link #byMatchingArguments(Class, String, Object...)}
+ *      to call a public method that matches the specified arguments.</li>
+ * </ul>
+ */
 public class MethodExecutionStrategy implements ExecutionStrategy {
     private Method method;
     private Object[] arguments;
@@ -27,10 +42,28 @@ public class MethodExecutionStrategy implements ExecutionStrategy {
         }
     }
 
+    /**
+     * Creates a {@link MethodExecutionStrategy} that will call the specified {@link Method}.
+     *
+     * @param method the {@link Method} to execute
+     * @param arguments the arguments to be passed to the method
+     * @return the value returned by the method, or {@code null}
+     */
     public static MethodExecutionStrategy byMethod(Method method, Object... arguments) {
         return new MethodExecutionStrategy(method, arguments);
     }
 
+    /**
+     * Creates a {@link MethodExecutionStrategy} that will call the public method with the
+     * specified argument types and passes the specified argument list.
+     *
+     * @param clazz the {@link Class}
+     * @param methodName the method name
+     * @param argumentTypes the argument types defining the constructor to call
+     * @param arguments the arguments to pass to the constructor (may contain {@code null})
+     * @return the created {@link DefaultConstructorStrategy}
+     * @throws ScriptException if no matching public method was found
+     */
     public static MethodExecutionStrategy byArgumentTypes(Class<?> clazz, String methodName, Class<?>[] argumentTypes, Object... arguments) throws ScriptException {
         try {
             Method method = clazz.getMethod(methodName, argumentTypes);
@@ -40,6 +73,21 @@ public class MethodExecutionStrategy implements ExecutionStrategy {
         }
     }
 
+    /**
+     * Creates a {@link MethodExecutionStrategy} that will call a public method that matches the
+     * specified arguments.
+     *
+     * A method must match all specified arguments, except {@code null} values which
+     * match any non-primitive type.
+     * The conversion from object types into corresponding primitive types
+     * (for example {@link Integer} into {@code int}) is handled automatically.
+     *
+     * @param clazz the {@link Class}
+     * @param methodName the method name
+     * @param arguments the arguments to be passed to the method
+     * @return the value returned by the method, or {@code null}
+     * @throws ScriptException if no matching public method was found
+     */
     public static MethodExecutionStrategy byMatchingArguments(Class<?> clazz, String methodName, Object... arguments) throws ScriptException {
         List<Method> matchingMethods = new ArrayList<>();
         for (Method method : clazz.getMethods()) {
@@ -59,5 +107,4 @@ public class MethodExecutionStrategy implements ExecutionStrategy {
 
         return byMethod(matchingMethods.get(0), arguments);
     }
-
 }

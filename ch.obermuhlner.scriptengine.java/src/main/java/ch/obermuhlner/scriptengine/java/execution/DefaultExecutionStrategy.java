@@ -1,5 +1,7 @@
 package ch.obermuhlner.scriptengine.java.execution;
 
+import ch.obermuhlner.scriptengine.java.constructor.ConstructorStrategy;
+
 import javax.script.ScriptException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -8,11 +10,25 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Supplier;
 
+/**
+ * The default {@link ExecutionStrategy} implementation.
+ *
+ * <ul>
+ *      <li>class implements `Supplier`: the `get()` method is called</li>
+ *      <li>class implements `Runnable`: the `run()` method is called</li>
+ *      <li>class has exactly one public method without arguments: call it</li>
+ * </ul>
+ */
 public class DefaultExecutionStrategy implements ExecutionStrategy {
 
     private final Class<?> clazz;
     private final Method method;
 
+    /**
+     * Constructs a {@link DefaultExecutionStrategy} for the specified {@link Class}.
+     *
+     * @param clazz the {@link Class}
+     */
     public DefaultExecutionStrategy(Class<?> clazz) {
         method = findCallableMethod(clazz);
         this.clazz = clazz;

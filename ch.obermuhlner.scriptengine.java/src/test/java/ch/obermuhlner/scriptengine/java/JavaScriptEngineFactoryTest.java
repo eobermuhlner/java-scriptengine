@@ -18,7 +18,7 @@ public class JavaScriptEngineFactoryTest {
     @Test
     public void testGetEngineVersion() {
         JavaScriptEngineFactory factory = new JavaScriptEngineFactory();
-        assertThat(factory.getEngineVersion()).isEqualTo("0.1.0");
+        assertThat(factory.getEngineVersion()).isEqualTo("1.1.0");
     }
 
     @Test

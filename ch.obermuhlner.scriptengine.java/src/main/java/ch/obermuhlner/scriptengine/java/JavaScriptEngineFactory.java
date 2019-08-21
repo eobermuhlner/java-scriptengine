@@ -5,6 +5,9 @@ import javax.script.ScriptEngineFactory;
 import java.util.Arrays;
 import java.util.List;
 
+/**
+ * Factory for the {@link JavaScriptEngine}.
+ */
 public class JavaScriptEngineFactory implements ScriptEngineFactory {
     @Override
     public String getEngineName() {
@@ -13,7 +16,7 @@ public class JavaScriptEngineFactory implements ScriptEngineFactory {
 
     @Override
     public String getEngineVersion() {
-        return "0.1.0";
+        return "1.1.0";
     }
 
     @Override

@@ -16,6 +16,9 @@ import java.io.Reader;
 import java.util.*;
 import java.util.stream.Collectors;
 
+/**
+ * Script engine to compile and run a Java class on the fly.
+ */
 public class JavaScriptEngine implements ScriptEngine, Compilable {
 
     private NameStrategy nameStrategy = new DefaultNameStrategy();
@@ -24,14 +27,29 @@ public class JavaScriptEngine implements ScriptEngine, Compilable {
 
     private ScriptContext context = new SimpleScriptContext();
 
+    /**
+     * Sets the name strategy used to determine the Java class name from a script.
+     *
+     * @param nameStrategy the {@link NameStrategy} to use in this script engine
+     */
     public void setNameStrategy(NameStrategy nameStrategy) {
         this.nameStrategy = nameStrategy;
     }
 
+    /**
+     * Sets the constructor strategy used to construct a Java instance of a class.
+     *
+     * @param constructorStrategy the {@link ConstructorStrategy} to use in this script engine
+     */
     public void setConstructorStrategy(ConstructorStrategy constructorStrategy) {
         this.constructorStrategy = constructorStrategy;
     }
 
+    /**
+     * Sets the factory for the execution strategy used to execute a method of a class instance.
+     *
+     * @param executionStrategyFactory the {@link ExecutionStrategyFactory} to use in this script engine
+     */
     public void setExecutionStrategyFactory(ExecutionStrategyFactory executionStrategyFactory) {
         this.executionStrategyFactory = executionStrategyFactory;
     }
