@@ -507,9 +507,29 @@ public class JavaScriptEngineTest {
         assertThat(result).isEqualTo("Message: Hello42");
     }
 
+    @Test
+    public void testPrivateStaticClass() throws ScriptException {
+        ScriptEngineManager manager = new ScriptEngineManager();
+        ScriptEngine engine = manager.getEngineByName("java");
+
+        Object result = engine.eval("" +
+                "public class Script {" +
+                "   public Object getMessage() {" +
+                "       return new ScriptPrivateClass();" +
+                "   }" +
+                "   private static class ScriptPrivateClass {" +
+                "       public String toString() {" +
+                "           return \"Hello\";" +
+                "       }" +
+                "   }" +
+                "}");
+        assertThat(result.getClass().getSimpleName()).isEqualTo("ScriptPrivateClass");
+        assertThat(result.toString()).isEqualTo("Hello");
+    }
+
     @Ignore
     @Test
-    public void testPublicClass() throws ScriptException {
+    public void testCallerPublicClass() throws ScriptException {
         ScriptEngineManager manager = new ScriptEngineManager();
         ScriptEngine engine = manager.getEngineByName("java");
 
@@ -519,7 +539,7 @@ public class JavaScriptEngineTest {
                 "       PublicClass result = new ch.obermuhlner.scriptengine.java.JavaScriptEngineTest.PublicClass();" +
                 "       result.message = \"Hello\";" +
                 "       return result.message;" +
-                "   } " +
+                "   }" +
                 "}");
         //assertThat(result).isInstanceOf(PublicClass.class);
         assertThat(result).isEqualTo("Hello");
