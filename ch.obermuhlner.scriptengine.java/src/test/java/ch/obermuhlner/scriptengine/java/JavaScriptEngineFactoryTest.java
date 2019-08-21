@@ -6,7 +6,6 @@ import javax.script.ScriptEngine;
 import java.util.Arrays;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertTrue;
 
 public class JavaScriptEngineFactoryTest {
     @Test

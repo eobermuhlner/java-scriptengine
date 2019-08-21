@@ -1,7 +1,5 @@
 package ch.obermuhlner.scriptengine.java.execution;
 
-import ch.obermuhlner.scriptengine.java.constructor.ConstructorStrategy;
-
 import javax.script.ScriptException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
