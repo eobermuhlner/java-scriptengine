@@ -1,55 +1,19 @@
 # API changes
 
-## `ConstructorStrategy` may return `null` to run `static` methods
-
-The `ConstructorStrategy` is now allowed to return a `null` instance.
-This indicates that a static method should be called in the
-`ExecutionStrategy`. 
-
-The `DefaultExecutionStrategy` and `MethodExecutionStrategy` support this behaviour.
-
-Using a `NullConstructorStrategy` is the most convenient way to do this.
+No API changes.
 
 
 # Bugfixes
 
-## `MethodExecutionStrategy.byMatchingArguments()` did not check `methodName`
-
-MethodExecutionStrategy.byMatchingArguments() is supposed to search for
-a method with the specified methodName, but the name was actually ignored.
-
-## Engine version
-
-The `JavaScriptEngineFactory.getEngineVersion()` of release 1.0.0 
-reported a wrong version "0.0.1". 
-
-The new release reports the now correct version "1.0.1".
+No Bugfix changes.
 
 
 # Enhancements
 
-## Improved error messages for ambiguous constructors and methods 
+## Added `Example.method(y)`
 
-The error messages for ambiguous constructors and methods in the
-`ScriptException`s thrown by the `DefaultConstructorStrategy`
-and the `MethodExecutionStrategy` have been improved to list the
-ambiguous constructors and methods.
+Added `Example.method(y)` 
 
-``` console
-Ambiguous constructors with matching arguments found:
-public ch.obermuhlner.scriptengine.java.constructor.DefaultConstructorStrategyTest$TestConstructor(java.lang.String,java.lang.Long,int)
-public ch.obermuhlner.scriptengine.java.constructor.DefaultConstructorStrategyTest$TestConstructor(java.lang.String,java.lang.String,int)
-```
-
-``` console
-Ambiguous methods 'doSomething' with matching arguments found:
-public java.lang.String ch.obermuhlner.scriptengine.java.execution.MethodExecutionStrategyTest$TestMethod.doSomething(java.lang.String,java.lang.Long,int)
-public java.lang.String ch.obermuhlner.scriptengine.java.execution.MethodExecutionStrategyTest$TestMethod.doSomething(java.lang.String,java.lang.String,int)
-```
-
-## Javadoc
-
-Javadoc was written for all public classes.
 
 # Examples
 
