@@ -13,6 +13,13 @@ archivesBaseName = 'java-scriptengine'
 
 ext {
     moduleName = "ch.obermuhlner.scriptengine.java"
+
+	if (!project.hasProperty("ossrhUsername")) {
+		ossrhUsername = "undefined"
+	}
+	if (!project.hasProperty("ossrhPassword")) {
+		ossrhPassword="undefined"
+	}
 }
 
 repositories {
@@ -76,7 +83,6 @@ artifacts {
     archives javadocJar
 }
 
-/*
 signing {
     sign configurations.archives
 }
@@ -125,6 +131,5 @@ uploadArchives {
 	    }
 	}
 }
-*/
 
 // See http://central.sonatype.org/pages/gradle.html
