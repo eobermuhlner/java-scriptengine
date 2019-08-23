@@ -118,6 +118,19 @@ Result1: Hello World #1
 Result2: Hello World #2
 ```
 
+Separating the compilation from the evaluation is more efficient if you
+need to evaluate the same script multiple times.
+
+Here the execution times in milliseconds for:
+* Multi Eval
+  * many calls to `JavaScriptEngine.eval(String)`
+    (essentially compile and evaluate every time)
+* Compile + Multi Eval
+  * single call to `JavaScriptEngine.compile(String)`
+  * many calls to `JavaCompiledScript.eval(Bindings)`
+
+![Performance: Compile Multiple Evaluations](docs/performance/Compile_Multiple_Evaluations.svg)
+
 ## Binding variables 
 
 You can read and write `public` variables, both instance variables (fields) and static variables,
