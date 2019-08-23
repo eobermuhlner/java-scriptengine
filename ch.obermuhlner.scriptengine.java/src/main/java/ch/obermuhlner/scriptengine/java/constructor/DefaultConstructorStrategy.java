@@ -1,6 +1,6 @@
 package ch.obermuhlner.scriptengine.java.constructor;
 
-import ch.obermuhlner.scriptengine.java.internal.ReflectionUtil;
+import ch.obermuhlner.scriptengine.java.util.ReflectionUtil;
 
 import javax.script.ScriptException;
 import java.lang.reflect.Constructor;

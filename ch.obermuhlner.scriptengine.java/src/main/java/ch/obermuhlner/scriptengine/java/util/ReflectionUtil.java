@@ -1,4 +1,4 @@
-package ch.obermuhlner.scriptengine.java.internal;
+package ch.obermuhlner.scriptengine.java.util;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;

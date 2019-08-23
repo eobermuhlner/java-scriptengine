@@ -1,7 +1,6 @@
 package ch.obermuhlner.scriptengine.java.execution;
 
-import ch.obermuhlner.scriptengine.java.constructor.DefaultConstructorStrategy;
-import ch.obermuhlner.scriptengine.java.internal.ReflectionUtil;
+import ch.obermuhlner.scriptengine.java.util.ReflectionUtil;
 
 import javax.script.ScriptException;
 import java.lang.reflect.InvocationTargetException;
@@ -9,7 +8,6 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.StringJoiner;
 import java.util.stream.Collectors;
 
 /**
@@ -56,6 +54,24 @@ public class MethodExecutionStrategy implements ExecutionStrategy {
     }
 
     /**
+     * Creates a {@link MethodExecutionStrategy} that will call the {@code public static void main(String[] args)}
+     * with the specified arguments.
+     *
+     * @param clazz the {@link Class}
+     * @param arguments the arguments to pass to the main method
+     * @return the created {@link MethodExecutionStrategy}
+     * @throws ScriptException if no {@code public static void main(String[] args)} method was found
+     */
+    public static MethodExecutionStrategy byMainMethod(Class<?> clazz, String... arguments) throws ScriptException {
+        try {
+            Method method = clazz.getMethod("main", String[].class);
+            return new MethodExecutionStrategy(method, arguments);
+        } catch (NoSuchMethodException e) {
+            throw new ScriptException(e);
+        }
+    }
+
+    /**
      * Creates a {@link MethodExecutionStrategy} that will call the public method with the
      * specified argument types and passes the specified argument list.
      *
@@ -63,7 +79,7 @@ public class MethodExecutionStrategy implements ExecutionStrategy {
      * @param methodName the method name
      * @param argumentTypes the argument types defining the constructor to call
      * @param arguments the arguments to pass to the constructor (may contain {@code null})
-     * @return the created {@link DefaultConstructorStrategy}
+     * @return the created {@link MethodExecutionStrategy}
      * @throws ScriptException if no matching public method was found
      */
     public static MethodExecutionStrategy byArgumentTypes(Class<?> clazz, String methodName, Class<?>[] argumentTypes, Object... arguments) throws ScriptException {
@@ -87,7 +103,7 @@ public class MethodExecutionStrategy implements ExecutionStrategy {
      * @param clazz the {@link Class}
      * @param methodName the method name
      * @param arguments the arguments to be passed to the method
-     * @return the value returned by the method, or {@code null}
+     * @return the created {@link MethodExecutionStrategy}
      * @throws ScriptException if no matching public method was found
      */
     public static MethodExecutionStrategy byMatchingArguments(Class<?> clazz, String methodName, Object... arguments) throws ScriptException {

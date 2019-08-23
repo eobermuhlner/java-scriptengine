@@ -1,5 +1,7 @@
 package ch.obermuhlner.scriptengine.java;
 
+import ch.obermuhlner.scriptengine.java.util.CompositeIterator;
+
 import javax.tools.*;
 import java.io.*;
 import java.net.URI;
@@ -60,7 +62,7 @@ public class MemoryFileManager extends ForwardingJavaFileManager<JavaFileManager
 
         if (location == CLASS_OUTPUT) {
             Collection<? extends JavaFileObject> generatedClasses = memoryClasses();
-            return () -> new ChainIterator<JavaFileObject>(
+            return () -> new CompositeIterator<JavaFileObject>(
                     list.iterator(),
                     generatedClasses.iterator());
         }
@@ -159,38 +161,4 @@ public class MemoryFileManager extends ForwardingJavaFileManager<JavaFileManager
         }
     }
 
-    static class ChainIterator<T> implements Iterator<T> {
-        private final Iterator<? extends T>[] iterators;
-        private int iteratorIndex = 0;
-
-        public ChainIterator(Iterator<? extends T>... iterators) {
-            this.iterators = iterators;
-        }
-
-        @Override
-        public boolean hasNext() {
-            if (iteratorIndex > iterators.length) {
-                return false;
-            }
-            if (iterators[iteratorIndex].hasNext()) {
-                return true;
-            }
-            iteratorIndex++;
-
-            if (iteratorIndex > iterators.length) {
-                return false;
-            }
-
-            return iterators[iteratorIndex].hasNext();
-        }
-
-        @Override
-        public T next() {
-            if (!hasNext()) {
-                throw new NoSuchElementException();
-            }
-
-            return iterators[iteratorIndex].next();
-        }
-    }
 }

@@ -1,5 +1,6 @@
-package ch.obermuhlner.scriptengine.java.internal;
+package ch.obermuhlner.scriptengine.java.util;
 
+import org.assertj.core.api.Assertions;
 import org.junit.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -7,7 +8,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class ReflectionUtilTest {
     @Test
     public void testMatchesArguments() {
-        assertThat(ReflectionUtil.matchesArguments(
+        Assertions.assertThat(ReflectionUtil.matchesArguments(
                 new Class<?>[] { int.class, double.class },
                 new Object[] { 123, 3.1416 }))
                 .isEqualTo(true);
