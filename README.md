@@ -16,7 +16,9 @@ The script source is a standard Java class that out of the box must follow these
 * Callable entry point. One of the following:
    * class implements `Supplier`: the `get()` method is called
    * class implements `Runnable`: the `run()` method is called
-   * class has exactly one `public` method with no arguments: call it
+   * class has exactly one `public` method with no arguments: call it<br>
+     Note: The class may have any number `private` methods 
+     and `public` methods with arguments.
 
 The script class can be arbitrarily named and may be in a named package or the default package.
 
