@@ -5,14 +5,21 @@ No API changes.
 
 # Bugfixes
 
-No Bugfix changes.
+## Fix javadoc in `MethodExecutionStrategy` `byArgumentTypes()` and `byMatchingArguments()`
+
+The javadoc for the methods
+* `MethodExecutionStrategy.byArgumentTypes()`
+* `MethodExecutionStrategy.byMatchingArguments()`
+
+described the return value wrong.
 
 
 # Enhancements
 
-## Added `Example.method(y)`
+## Added `MethodExecutionStrategy.byMainMethod()`
 
-Added `Example.method(y)` 
+Added `MethodExecutionStrategy.byMainMethod()` that will call the `public static void main(String[] args)`
+with the specified arguments. 
 
 
 # Examples
