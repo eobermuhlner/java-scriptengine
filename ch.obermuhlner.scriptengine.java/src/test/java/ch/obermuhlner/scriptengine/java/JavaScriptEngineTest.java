@@ -69,6 +69,7 @@ public class JavaScriptEngineTest {
 
         Object result = engine.eval("" +
                 "public class Script implements java.util.function.Supplier<String> {" +
+                "   @Override" +
                 "   public String get() {" +
                 "       return \"Hello\";" +
                 "   }" +
@@ -87,6 +88,7 @@ public class JavaScriptEngineTest {
         Object result = engine.eval("" +
                 "public class Script implements java.lang.Runnable {" +
                 "   public String message;" +
+                "   @Override" +
                 "   public void run() {" +
                 "       message = \"Hello\";" +
                 "   } " +
