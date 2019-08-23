@@ -12,24 +12,24 @@ import java.util.Map;
  */
 public class JavaCompiledScript extends CompiledScript {
     private final JavaScriptEngine engine;
-    private final Class<?> instanceClass;
-    private final Object instance;
+    private final Class<?> compiledClass;
+    private final Object compiledInstance;
     private ExecutionStrategy executionStrategy;
 
     /**
      * Construct a {@link JavaCompiledScript}.
      *
      * @param engine the {@link JavaScriptEngine} that compiled this script
-     * @param instanceClass the compiled {@link Class}
-     * @param instance the instance of the compiled {@link Class} or {@code null}
-     *                 if no instance was created and only static methods will be called
-     *                 by the the {@link ExecutionStrategy}.
+     * @param compiledClass the compiled {@link Class}
+     * @param compiledInstance the instance of the compiled {@link Class} or {@code null}
+     *                         if no instance was created and only static methods will be called
+     *                         by the the {@link ExecutionStrategy}.
      * @param executionStrategy the {@link ExecutionStrategy}
      */
-    JavaCompiledScript(JavaScriptEngine engine, Class<?> instanceClass, Object instance, ExecutionStrategy executionStrategy) {
+    JavaCompiledScript(JavaScriptEngine engine, Class<?> compiledClass, Object compiledInstance, ExecutionStrategy executionStrategy) {
         this.engine = engine;
-        this.instanceClass = instanceClass;
-        this.instance = instance;
+        this.compiledClass = compiledClass;
+        this.compiledInstance = compiledInstance;
         this.executionStrategy = executionStrategy;
     }
 
@@ -38,8 +38,8 @@ public class JavaCompiledScript extends CompiledScript {
      *
      * @return the compiled {@link Class}.
      */
-    public Class<?> getInstanceClass() {
-        return instanceClass;
+    public Class<?> getCompiledClass() {
+        return compiledClass;
     }
 
     /**
@@ -49,8 +49,8 @@ public class JavaCompiledScript extends CompiledScript {
      *         if no instance was created and only static methods will be called
      *         by the the {@link ExecutionStrategy}.
      */
-    public Object getInstance() {
-        return instance;
+    public Object getCompiledInstance() {
+        return compiledInstance;
     }
 
     /**
@@ -73,7 +73,7 @@ public class JavaCompiledScript extends CompiledScript {
         Bindings engineBindings = context.getBindings(ScriptContext.ENGINE_SCOPE);
 
         pushVariables(globalBindings, engineBindings);
-        Object result = executionStrategy.execute(instance);
+        Object result = executionStrategy.execute(compiledInstance);
         pullVariables(globalBindings, engineBindings);
 
         return result;
@@ -87,8 +87,8 @@ public class JavaCompiledScript extends CompiledScript {
             Object value = entry.getValue();
 
             try {
-                Field field = instanceClass.getField(name);
-                field.set(instance, value);
+                Field field = compiledClass.getField(name);
+                field.set(compiledInstance, value);
             } catch (NoSuchFieldException | IllegalAccessException e) {
                 throw new ScriptException(e);
             }
@@ -96,10 +96,10 @@ public class JavaCompiledScript extends CompiledScript {
     }
 
     private void pullVariables(Bindings globalBindings, Bindings engineBindings) throws ScriptException {
-        for (Field field : instanceClass.getFields()) {
+        for (Field field : compiledClass.getFields()) {
             try {
                 String name = field.getName();
-                Object value = field.get(instance);
+                Object value = field.get(compiledInstance);
                 setBindingsValue(globalBindings, engineBindings, name, value);
             } catch (IllegalAccessException e) {
                 throw new ScriptException(e);

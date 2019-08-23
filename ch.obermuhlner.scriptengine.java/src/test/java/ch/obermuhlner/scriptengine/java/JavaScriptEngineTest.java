@@ -433,9 +433,9 @@ public class JavaScriptEngineTest {
         assertThat(compiledScript.getEngine()).isSameAs(engine);
 
         JavaCompiledScript javaCompiledScript = (JavaCompiledScript) compiledScript;
-        assertThat(javaCompiledScript.getInstanceClass().getName()).isEqualTo("CompiledScript");
-        assertThat(javaCompiledScript.getInstance()).isNotNull();
-        assertThat(javaCompiledScript.getInstance().getClass().getName()).isEqualTo("CompiledScript");
+        assertThat(javaCompiledScript.getCompiledClass().getName()).isEqualTo("CompiledScript");
+        assertThat(javaCompiledScript.getCompiledInstance()).isNotNull();
+        assertThat(javaCompiledScript.getCompiledInstance().getClass().getName()).isEqualTo("CompiledScript");
 
         for (int i = 0; i < 2; i++) {
             Bindings bindings = engine.createBindings();
@@ -469,9 +469,9 @@ public class JavaScriptEngineTest {
         assertThat(compiledScript.getEngine()).isSameAs(engine);
 
         JavaCompiledScript javaCompiledScript = (JavaCompiledScript) compiledScript;
-        assertThat(javaCompiledScript.getInstanceClass().getName()).isEqualTo("CompiledScript");
-        assertThat(javaCompiledScript.getInstance()).isNotNull();
-        assertThat(javaCompiledScript.getInstance().getClass().getName()).isEqualTo("CompiledScript");
+        assertThat(javaCompiledScript.getCompiledClass().getName()).isEqualTo("CompiledScript");
+        assertThat(javaCompiledScript.getCompiledInstance()).isNotNull();
+        assertThat(javaCompiledScript.getCompiledInstance().getClass().getName()).isEqualTo("CompiledScript");
 
         for (int i = 0; i < 2; i++) {
             Bindings bindings = engine.createBindings();
@@ -500,7 +500,7 @@ public class JavaScriptEngineTest {
         JavaCompiledScript javaCompiledScript = (JavaCompiledScript) compiledScript;
 
         javaCompiledScript.setExecutionStrategy(MethodExecutionStrategy.byMatchingArguments(
-                    javaCompiledScript.getInstanceClass(),
+                    javaCompiledScript.getCompiledClass(),
                     "getMessage",
                     "Hello", 42));
 
