@@ -1,7 +1,11 @@
 # API changes
 
-No API changes.
+## Renamed to `getCompiledClass()` and `getCompiledInstance()`
 
+Renamed the following methods:
+ 
+* `JavaCompiledScript.getInstanceClass()` to `getCompiledClass()` 
+* `JavaCompiledScript.getInstance()` to `getCompiledInstance()` 
 
 # Bugfixes
 
