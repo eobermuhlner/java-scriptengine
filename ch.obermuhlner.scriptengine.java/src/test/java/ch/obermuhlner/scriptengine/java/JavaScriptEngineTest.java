@@ -4,7 +4,6 @@ import ch.obermuhlner.scriptengine.java.constructor.DefaultConstructorStrategy;
 import ch.obermuhlner.scriptengine.java.constructor.NullConstructorStrategy;
 import ch.obermuhlner.scriptengine.java.execution.MethodExecutionStrategy;
 import ch.obermuhlner.scriptengine.java.name.FixNameStrategy;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import javax.script.*;
@@ -529,22 +528,26 @@ public class JavaScriptEngineTest {
         assertThat(result.toString()).isEqualTo("Hello");
     }
 
-    @Ignore
     @Test
     public void testCallerPublicClass() throws ScriptException {
         ScriptEngineManager manager = new ScriptEngineManager();
         ScriptEngine engine = manager.getEngineByName("java");
+        JavaScriptEngine javaScriptEngine = (JavaScriptEngine) engine;
 
-        Object result = engine.eval("" +
+        JavaCompiledScript compiledScript = javaScriptEngine.compile("" +
+                "import ch.obermuhlner.scriptengine.java.JavaScriptEngineTest.PublicClass;" +
                 "public class Script {" +
                 "   public Object getMessage() {" +
-                "       PublicClass result = new ch.obermuhlner.scriptengine.java.JavaScriptEngineTest.PublicClass();" +
+                "       PublicClass result = new PublicClass();" +
                 "       result.message = \"Hello\";" +
-                "       return result.message;" +
+                "       return result;" +
                 "   }" +
                 "}");
-        //assertThat(result).isInstanceOf(PublicClass.class);
-        assertThat(result).isEqualTo("Hello");
+
+        Object result = compiledScript.eval();
+
+        assertThat(result).isInstanceOf(PublicClass.class);
+        assertThat(((PublicClass)result).message).isEqualTo("Hello");
     }
 
     @Test
@@ -607,7 +610,7 @@ public class JavaScriptEngineTest {
 
         Reader reader = new FailReader();
         assertThatThrownBy(() -> {
-            Object result = engine.eval(reader);
+            engine.eval(reader);
         }).isInstanceOf(ScriptException.class);
     }
 

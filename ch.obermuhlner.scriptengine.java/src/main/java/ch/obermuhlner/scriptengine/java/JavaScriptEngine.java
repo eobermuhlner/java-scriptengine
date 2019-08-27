@@ -27,6 +27,8 @@ public class JavaScriptEngine implements ScriptEngine, Compilable {
 
     private ScriptContext context = new SimpleScriptContext();
 
+    private ClassLoader executionClassLoader = getClass().getClassLoader();
+
     /**
      * Sets the name strategy used to determine the Java class name from a script.
      *
@@ -52,6 +54,15 @@ public class JavaScriptEngine implements ScriptEngine, Compilable {
      */
     public void setExecutionStrategyFactory(ExecutionStrategyFactory executionStrategyFactory) {
         this.executionStrategyFactory = executionStrategyFactory;
+    }
+
+    /**
+     * Sets the {@link ClassLoader} used to load and execute the class.
+     *
+     * @param executionClassLoader the execution {@link ClassLoader}
+     */
+    public void setExecutionClassLoader(ClassLoader executionClassLoader) {
+        this.executionClassLoader = executionClassLoader;
     }
 
     @Override
@@ -132,14 +143,16 @@ public class JavaScriptEngine implements ScriptEngine, Compilable {
         JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
         final DiagnosticCollector<JavaFileObject> diagnostics = new DiagnosticCollector<>();
         StandardJavaFileManager standardFileManager = compiler.getStandardFileManager(diagnostics, null, null);
-        MemoryFileManager memoryFileManager = new MemoryFileManager(standardFileManager);
+        MemoryFileManager memoryFileManager = new MemoryFileManager(standardFileManager, executionClassLoader);
 
         String fullClassName = nameStrategy.getFullName(script);
         String simpleClassName = NameStrategy.extractSimpleName(fullClassName);
 
         JavaFileObject scriptSource = memoryFileManager.createSourceFileObject(null, simpleClassName, script);
 
-        JavaCompiler.CompilationTask task = compiler.getTask(null, memoryFileManager, diagnostics, null, null, Arrays.asList(scriptSource));
+        List<String> options = Arrays.asList("-classpath", System.getProperty("java.class.path"));
+
+        JavaCompiler.CompilationTask task = compiler.getTask(null, memoryFileManager, diagnostics, options, null, Arrays.asList(scriptSource));
         if (!task.call()) {
             String message = diagnostics.getDiagnostics().stream()
                     .map(d -> d.toString())
@@ -148,6 +161,7 @@ public class JavaScriptEngine implements ScriptEngine, Compilable {
         }
 
         ClassLoader classLoader = memoryFileManager.getClassLoader(StandardLocation.CLASS_OUTPUT);
+
         try {
             Class<?> clazz = classLoader.loadClass(fullClassName);
             Object instance = constructorStrategy.construct(clazz);

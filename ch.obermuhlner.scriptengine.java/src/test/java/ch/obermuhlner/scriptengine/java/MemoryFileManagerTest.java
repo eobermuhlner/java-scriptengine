@@ -16,7 +16,7 @@ public class MemoryFileManagerTest {
     public void testCreateSourceFileObject() throws IOException {
         JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
         StandardJavaFileManager standardFileManager = compiler.getStandardFileManager(null, null, null);
-        try (MemoryFileManager memoryFileManager = new MemoryFileManager(standardFileManager)) {
+        try (MemoryFileManager memoryFileManager = new MemoryFileManager(standardFileManager, null)) {
             String code = "public class XXX {}";
             JavaFileObject javaFileObject = memoryFileManager.createSourceFileObject("origin", "XXX", code);
 
@@ -34,7 +34,7 @@ public class MemoryFileManagerTest {
     public void testGetJavaFileForOutput() throws IOException {
         JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
         StandardJavaFileManager standardFileManager = compiler.getStandardFileManager(null, null, null);
-        try (MemoryFileManager memoryFileManager = new MemoryFileManager(standardFileManager)) {
+        try (MemoryFileManager memoryFileManager = new MemoryFileManager(standardFileManager, null)) {
             JavaFileObject javaFileObject = memoryFileManager.getJavaFileForOutput(StandardLocation.CLASS_OUTPUT, "XXX", JavaFileObject.Kind.CLASS, null);
             assertThat(javaFileObject).isInstanceOf(MemoryFileManager.ClassMemoryJavaFileObject.class);
 
@@ -47,7 +47,7 @@ public class MemoryFileManagerTest {
     public void testList() throws IOException, ClassNotFoundException {
         JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
         StandardJavaFileManager standardFileManager = compiler.getStandardFileManager(null, null, null);
-        try (MemoryFileManager memoryFileManager = new MemoryFileManager(standardFileManager)) {
+        try (MemoryFileManager memoryFileManager = new MemoryFileManager(standardFileManager, null)) {
             JavaFileObject javaFileObject = memoryFileManager.getJavaFileForOutput(StandardLocation.CLASS_OUTPUT, "XXX", JavaFileObject.Kind.CLASS, null);
 
             Iterable<JavaFileObject> result = memoryFileManager.list(
@@ -62,7 +62,7 @@ public class MemoryFileManagerTest {
     public void testClassLoader() throws IOException, ClassNotFoundException {
         JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
         StandardJavaFileManager standardFileManager = compiler.getStandardFileManager(null, null, null);
-        try (MemoryFileManager memoryFileManager = new MemoryFileManager(standardFileManager)) {
+        try (MemoryFileManager memoryFileManager = new MemoryFileManager(standardFileManager, null)) {
             memoryFileManager.getJavaFileForOutput(StandardLocation.CLASS_OUTPUT, "XXX", JavaFileObject.Kind.CLASS, null);
 
             ClassLoader classLoader = memoryFileManager.getClassLoader(StandardLocation.CLASS_OUTPUT);

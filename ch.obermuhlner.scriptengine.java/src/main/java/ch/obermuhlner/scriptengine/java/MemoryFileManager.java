@@ -16,14 +16,16 @@ import static javax.tools.StandardLocation.CLASS_OUTPUT;
 public class MemoryFileManager extends ForwardingJavaFileManager<JavaFileManager> {
 
     private final Map<String, ClassMemoryJavaFileObject> mapNameToClasses = new HashMap<>();
+    private final ClassLoader parentClassLoader;
 
     /**
      * Creates a MemoryJavaFileManager.
      *
      * @param fileManager the {@link JavaFileManager}
      */
-    public MemoryFileManager(JavaFileManager fileManager) {
+    public MemoryFileManager(JavaFileManager fileManager, ClassLoader parentClassLoader) {
         super(fileManager);
+        this.parentClassLoader = parentClassLoader;
     }
 
     private Collection<ClassMemoryJavaFileObject> memoryClasses() {
@@ -38,6 +40,10 @@ public class MemoryFileManager extends ForwardingJavaFileManager<JavaFileManager
         ClassLoader classLoader = super.getClassLoader(location);
 
         if (location == CLASS_OUTPUT) {
+            if (parentClassLoader != null) {
+                classLoader = parentClassLoader;
+            }
+
             Map<String, byte[]> mapNameToBytes = new HashMap<>();
 
             for (ClassMemoryJavaFileObject outputMemoryJavaFileObject : memoryClasses()) {
