@@ -20,6 +20,8 @@ public class ScriptEngineExample {
         runConstructorStrategyMatchingArgumentsExample();
         runMethodExecutionStrategyFactoryMatchingArgumentsExample();
         runCompiledMethodExecutionStrategyMatchingArgumentsExample();
+        runCallerClassLoaderClassesExample();
+        runIsolatedClassesExample();
     }
 
     private static void runHelloWorldExample() {
@@ -230,12 +232,59 @@ public class ScriptEngineExample {
                     "}");
 
             compiledScript.setExecutionStrategy(MethodExecutionStrategy.byMatchingArguments(
-                    compiledScript.getInstanceClass(),
+                    compiledScript.getCompiledClass(),
                     "getMessage",
                     "Hello", 42));
 
             Object result = compiledScript.eval();
 
+            System.out.println("Result: " + result);
+        } catch (ScriptException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private static void runCallerClassLoaderClassesExample() {
+        try {
+            ScriptEngineManager manager = new ScriptEngineManager();
+            ScriptEngine engine = manager.getEngineByName("java");
+            JavaScriptEngine javaScriptEngine = (JavaScriptEngine) engine;
+
+            JavaCompiledScript compiledScript = javaScriptEngine.compile("" +
+                    "import ch.obermuhlner.scriptengine.example.Person;" +
+                    "public class Script {" +
+                    "   public Person getPerson() {" +
+                    "       Person person = new Person();" +
+                    "       person.name = \"Eric\";" +
+                    "       person.birthYear = 1967;" +
+                    "       return person;" +
+                    "   } " +
+                    "}");
+
+            Object result = compiledScript.eval();
+            System.out.println("Result: " + result);
+        } catch (ScriptException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private static void runIsolatedClassesExample() {
+        try {
+            ScriptEngineManager manager = new ScriptEngineManager();
+            ScriptEngine engine = manager.getEngineByName("java");
+            JavaScriptEngine javaScriptEngine = (JavaScriptEngine) engine;
+
+            javaScriptEngine.setIsolation(JavaScriptEngine.Isolation.Isolated);
+
+            JavaCompiledScript compiledScript = javaScriptEngine.compile("" +
+                    "import ch.obermuhlner.scriptengine.example.Person;" +
+                    "public class Script {" +
+                    "   public Object getPerson() {" +
+                    "       return 123;" +
+                    "   } " +
+                    "}");
+
+            Object result = compiledScript.eval();
             System.out.println("Result: " + result);
         } catch (ScriptException e) {
             e.printStackTrace();

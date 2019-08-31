@@ -24,6 +24,7 @@ public class JavaScriptEngine implements ScriptEngine, Compilable {
     private NameStrategy nameStrategy = new DefaultNameStrategy();
     private ConstructorStrategy constructorStrategy = DefaultConstructorStrategy.byDefaultConstructor();
     private ExecutionStrategyFactory executionStrategyFactory = clazz -> new DefaultExecutionStrategy(clazz);
+    private Isolation isolation = Isolation.CallerClassLoader;
 
     private ScriptContext context = new SimpleScriptContext();
 
@@ -63,6 +64,15 @@ public class JavaScriptEngine implements ScriptEngine, Compilable {
      */
     public void setExecutionClassLoader(ClassLoader executionClassLoader) {
         this.executionClassLoader = executionClassLoader;
+    }
+
+    /**
+     * Sets the isolation of the script.
+     *
+     * @param isolation the {@link Isolation}
+     */
+    public void setIsolation(Isolation isolation) {
+        this.isolation = isolation;
     }
 
     @Override
@@ -141,18 +151,17 @@ public class JavaScriptEngine implements ScriptEngine, Compilable {
     @Override
     public JavaCompiledScript compile(String script) throws ScriptException {
         JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
-        final DiagnosticCollector<JavaFileObject> diagnostics = new DiagnosticCollector<>();
+        DiagnosticCollector<JavaFileObject> diagnostics = new DiagnosticCollector<>();
         StandardJavaFileManager standardFileManager = compiler.getStandardFileManager(diagnostics, null, null);
-        MemoryFileManager memoryFileManager = new MemoryFileManager(standardFileManager, executionClassLoader);
+        ClassLoader parentClassLoader = isolation == Isolation.CallerClassLoader ? executionClassLoader : null;
+        MemoryFileManager memoryFileManager = new MemoryFileManager(standardFileManager, parentClassLoader);
 
         String fullClassName = nameStrategy.getFullName(script);
         String simpleClassName = NameStrategy.extractSimpleName(fullClassName);
 
         JavaFileObject scriptSource = memoryFileManager.createSourceFileObject(null, simpleClassName, script);
 
-        List<String> options = Arrays.asList("-classpath", System.getProperty("java.class.path"));
-
-        JavaCompiler.CompilationTask task = compiler.getTask(null, memoryFileManager, diagnostics, options, null, Arrays.asList(scriptSource));
+        JavaCompiler.CompilationTask task = compiler.getTask(null, memoryFileManager, diagnostics, null, null, Arrays.asList(scriptSource));
         if (!task.call()) {
             String message = diagnostics.getDiagnostics().stream()
                     .map(d -> d.toString())
@@ -190,5 +199,10 @@ public class JavaScriptEngine implements ScriptEngine, Compilable {
         } catch (IOException e) {
             throw new ScriptException(e);
         }
+    }
+
+    public static enum Isolation {
+        CallerClassLoader,
+        Isolated
     }
 }

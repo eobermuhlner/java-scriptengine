@@ -529,7 +529,7 @@ public class JavaScriptEngineTest {
     }
 
     @Test
-    public void testCallerPublicClass() throws ScriptException {
+    public void testIsolationCallerClassLoaderPublicClass() throws ScriptException {
         ScriptEngineManager manager = new ScriptEngineManager();
         ScriptEngine engine = manager.getEngineByName("java");
         JavaScriptEngine javaScriptEngine = (JavaScriptEngine) engine;
@@ -548,6 +548,29 @@ public class JavaScriptEngineTest {
 
         assertThat(result).isInstanceOf(PublicClass.class);
         assertThat(((PublicClass)result).message).isEqualTo("Hello");
+    }
+
+    @Test
+    public void testIsolationIsolatedPublicClass() throws ScriptException {
+        ScriptEngineManager manager = new ScriptEngineManager();
+        ScriptEngine engine = manager.getEngineByName("java");
+        JavaScriptEngine javaScriptEngine = (JavaScriptEngine) engine;
+
+        javaScriptEngine.setIsolation(JavaScriptEngine.Isolation.Isolated);
+
+        JavaCompiledScript compiledScript = javaScriptEngine.compile("" +
+                "import ch.obermuhlner.scriptengine.java.JavaScriptEngineTest.PublicClass;" +
+                "public class Script {" +
+                "   public Object getMessage() {" +
+                "       PublicClass result = new PublicClass();" +
+                "       result.message = \"Hello\";" +
+                "       return result;" +
+                "   }" +
+                "}");
+
+        assertThatThrownBy(() -> {
+            compiledScript.eval();
+        }).isInstanceOf(ScriptException.class);
     }
 
     @Test
