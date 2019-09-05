@@ -35,7 +35,7 @@ public class DefaultExecutionStrategy implements ExecutionStrategy {
     @Override
     public Object execute(Object instance) throws ScriptException {
         if (instance instanceof Supplier) {
-            Supplier supplier = (Supplier) instance;
+            Supplier<?> supplier = (Supplier<?>) instance;
             return supplier.get();
         }
 
