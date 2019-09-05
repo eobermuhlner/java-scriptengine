@@ -65,7 +65,7 @@ public class MethodExecutionStrategy implements ExecutionStrategy {
     public static MethodExecutionStrategy byMainMethod(Class<?> clazz, String... arguments) throws ScriptException {
         try {
             Method method = clazz.getMethod("main", String[].class);
-            return new MethodExecutionStrategy(method, arguments);
+            return new MethodExecutionStrategy(method, (Object[]) arguments);
         } catch (NoSuchMethodException e) {
             throw new ScriptException(e);
         }
