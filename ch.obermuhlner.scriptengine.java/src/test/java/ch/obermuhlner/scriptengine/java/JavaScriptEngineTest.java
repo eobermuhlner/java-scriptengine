@@ -556,7 +556,7 @@ public class JavaScriptEngineTest {
         ScriptEngine engine = manager.getEngineByName("java");
         JavaScriptEngine javaScriptEngine = (JavaScriptEngine) engine;
 
-        javaScriptEngine.setIsolation(JavaScriptEngine.Isolation.Isolated);
+        javaScriptEngine.setIsolation(JavaScriptEngine.Isolation.IsolatedClassLoader);
 
         JavaCompiledScript compiledScript = javaScriptEngine.compile("" +
                 "import ch.obermuhlner.scriptengine.java.JavaScriptEngineTest.PublicClass;" +
