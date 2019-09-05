@@ -1,5 +1,6 @@
 package ch.obermuhlner.scriptengine.example;
 
+import ch.obermuhlner.scriptengine.java.Isolation;
 import ch.obermuhlner.scriptengine.java.JavaCompiledScript;
 import ch.obermuhlner.scriptengine.java.JavaScriptEngine;
 import ch.obermuhlner.scriptengine.java.constructor.DefaultConstructorStrategy;
@@ -276,7 +277,7 @@ public class ScriptEngineExample {
             ScriptEngine engine = manager.getEngineByName("java");
             JavaScriptEngine javaScriptEngine = (JavaScriptEngine) engine;
 
-            javaScriptEngine.setIsolation(JavaScriptEngine.Isolation.IsolatedClassLoader);
+            javaScriptEngine.setIsolation(Isolation.IsolatedClassLoader);
 
             JavaCompiledScript compiledScript = javaScriptEngine.compile("" +
                     "import ch.obermuhlner.scriptengine.example.Person;" +
@@ -300,7 +301,7 @@ public class ScriptEngineExample {
             ScriptEngine engine = manager.getEngineByName("java");
             JavaScriptEngine javaScriptEngine = (JavaScriptEngine) engine;
 
-            javaScriptEngine.setIsolation(JavaScriptEngine.Isolation.IsolatedClassLoader);
+            javaScriptEngine.setIsolation(Isolation.IsolatedClassLoader);
 
             JavaCompiledScript compiledScript = javaScriptEngine.compile("" +
                     "import ch.obermuhlner.scriptengine.example.Person;" +
@@ -323,7 +324,7 @@ public class ScriptEngineExample {
             ScriptEngine engine = manager.getEngineByName("java");
             JavaScriptEngine javaScriptEngine = (JavaScriptEngine) engine;
 
-            javaScriptEngine.setIsolation(JavaScriptEngine.Isolation.IsolatedClassLoader);
+            javaScriptEngine.setIsolation(Isolation.IsolatedClassLoader);
 
             JavaCompiledScript compiledScript = javaScriptEngine.compile("" +
                     "import ch.obermuhlner.scriptengine.example.Person;" +

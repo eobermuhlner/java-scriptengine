@@ -201,8 +201,4 @@ public class JavaScriptEngine implements ScriptEngine, Compilable {
         }
     }
 
-    public static enum Isolation {
-        CallerClassLoader,
-        IsolatedClassLoader
-    }
 }
