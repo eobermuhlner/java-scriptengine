@@ -22,9 +22,11 @@ public class MemoryFileManager extends ForwardingJavaFileManager<JavaFileManager
      * Creates a MemoryJavaFileManager.
      *
      * @param fileManager the {@link JavaFileManager}
+     * @param parentClassLoader the parent {@link ClassLoader}
      */
     public MemoryFileManager(JavaFileManager fileManager, ClassLoader parentClassLoader) {
         super(fileManager);
+
         this.parentClassLoader = parentClassLoader;
     }
 
