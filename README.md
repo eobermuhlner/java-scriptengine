@@ -446,11 +446,16 @@ The script classes are executed using a special `codeBase`:
 
 This allows to grant specific permissions to the script classes.
 
-Here an example policy file `example.policy` (you will need to edit the file path to the application classes): 
+Here an example policy file `example.policy` (you will need to edit the file path to the application classes in your installation): 
 ```
 // global permissions (for the application and on-the-fly compiled script classes)
 grant {
   permission java.io.FilePermission "<<ALL FILES>>", "read";
+
+  permission java.util.PropertyPermission "application.home", "read";
+  permission java.util.PropertyPermission "env.class.path", "read";
+  permission java.util.PropertyPermission "java.class.path", "read";
+  permission java.util.PropertyPermission "java.home", "read";
 };
 
 // permissions for the example application
@@ -459,10 +464,6 @@ grant codeBase "file:/C:/Users/obe/git/java-scriptengine/ch.obermuhlner.scripten
   permission java.lang.RuntimePermission "accessSystemModules";
   permission java.lang.RuntimePermission "closeClassLoader";
   permission java.lang.RuntimePermission "createClassLoader";
-  permission java.util.PropertyPermission "application.home", "read";
-  permission java.util.PropertyPermission "env.class.path", "read";
-  permission java.util.PropertyPermission "java.class.path", "read";
-  permission java.util.PropertyPermission "java.home", "read";
 };
 
 // permissions for the java-scriptengine
@@ -471,26 +472,17 @@ grant codeBase "file:/C:/Users/obe/git/java-scriptengine/ch.obermuhlner.scripten
   permission java.lang.RuntimePermission "accessSystemModules";
   permission java.lang.RuntimePermission "closeClassLoader";
   permission java.lang.RuntimePermission "createClassLoader";
-  permission java.util.PropertyPermission "application.home", "read";
-  permission java.util.PropertyPermission "env.class.path", "read";
-  permission java.util.PropertyPermission "java.class.path", "read";
-  permission java.util.PropertyPermission "java.home", "read";
-  permission java.lang.RuntimePermission "exitVM";
-};
-
-// permissions for on-the-fly compiled script classes (notice the special URL)
-grant codeBase "jrt:/ch.obermuhlner.scriptengine.java/memory-class" {
-  permission java.lang.RuntimePermission "exitVM";
 };
 
 // permissions for the jdk.compiler module
 grant codeBase "jrt:/jdk.compiler" {
   permission java.lang.RuntimePermission "closeClassLoader";
   permission java.lang.RuntimePermission "createClassLoader";
-  permission java.util.PropertyPermission "application.home", "read";
-  permission java.util.PropertyPermission "env.class.path", "read";
-  permission java.util.PropertyPermission "java.class.path", "read";
-  permission java.util.PropertyPermission "java.home", "read";
+};
+
+// permissions for on-the-fly compiled script classes (notice the special URL)
+grant codeBase "jrt:/ch.obermuhlner.scriptengine.java/memory-class" {
+  permission java.lang.RuntimePermission "exitVM";
 };
 ```
 
