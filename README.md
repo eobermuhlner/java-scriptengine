@@ -189,6 +189,57 @@ Variable2 message: Hello world
 Variable2 counter: 3
 ```
 
+## ![Next Release](https://badgen.net/badge/Available/next%20release/orange) Using application classes from script
+
+The script can see classes of the calling application.
+
+Assume that the calling application declares the following class:
+
+```java
+package ch.obermuhlner.scriptengine.example;
+
+public class Person {
+    public String name;
+    public int birthYear;
+
+    @Override
+    public String toString() {
+        return "Person{name=" + name + ", birthYear=" + birthYear + "}";
+    }
+}
+```
+
+Your script has access to the public class declared in the calling application:
+```java
+try {
+    ScriptEngineManager manager = new ScriptEngineManager();
+    ScriptEngine engine = manager.getEngineByName("java");
+    JavaScriptEngine javaScriptEngine = (JavaScriptEngine) engine;
+
+    JavaCompiledScript compiledScript = javaScriptEngine.compile("" +
+            "import ch.obermuhlner.scriptengine.example.Person;" +
+            "public class Script {" +
+            "   public Person getPerson() {" +
+            "       Person person = new Person();" +
+            "       person.name = \"Eric\";" +
+            "       person.birthYear = 1967;" +
+            "       return person;" +
+            "   } " +
+            "}");
+
+    Object result = compiledScript.eval();
+    System.out.println("Result: " + result);
+} catch (ScriptException e) {
+    e.printStackTrace();
+}
+```
+
+The console output shows that the script was able to use class `Person`.
+```console
+Result: Person{name=Eric, birthYear=1967}
+```
+
+
 ## Advanced features of `JavaScriptEngine`
 
 The `JavaScriptEngine` has an additional API to control
@@ -375,3 +426,15 @@ try {
     e.printStackTrace();
 }
 ```
+
+### ![Next Release](https://badgen.net/badge/Available/next%20release/orange) Set `Isolation` in `JavaScriptEngine`
+
+You can specfy the `Isolation` level of the script.
+
+* `Isolation.CallerClassLoader`: the script can see the classes of the
+  calling application
+* `Isolation.IsolatedClassLoader`: the script can only see JDK classes
+  and classes declared inside the script
+
+The default behaviour is `Isolation.CallerClassLoader`.
+ 
