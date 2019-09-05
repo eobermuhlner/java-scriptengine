@@ -58,7 +58,6 @@ check.dependsOn jacocoTestReport
 jar {
     manifest {
         attributes(
-                "Automatic-Module-Name": moduleName,
                 "Bundle-ManifestVersion": 2,
                 "Bundle-Name": archivesBaseName,
                 "Bundle-SymbolicName": moduleName,
