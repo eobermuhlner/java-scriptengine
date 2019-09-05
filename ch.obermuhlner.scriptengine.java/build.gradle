@@ -63,7 +63,7 @@ jar {
                 "Bundle-Name": archivesBaseName,
                 "Bundle-SymbolicName": moduleName,
                 "Bundle-Version": version,
-                "Export-Package": "ch.obermuhlner.scriptengine.java")
+                "Export-Package": "ch.obermuhlner.scriptengine.java, ch.obermuhlner.scriptengine.java.constructor, ch.obermuhlner.scriptengine.java.execution, ch.obermuhlner.scriptengine.java.name, ch.obermuhlner.scriptengine.java.util")
     }
 }
 
