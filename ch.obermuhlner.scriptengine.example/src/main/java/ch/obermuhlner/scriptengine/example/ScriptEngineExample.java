@@ -20,8 +20,10 @@ public class ScriptEngineExample {
         runConstructorStrategyMatchingArgumentsExample();
         runMethodExecutionStrategyFactoryMatchingArgumentsExample();
         runCompiledMethodExecutionStrategyMatchingArgumentsExample();
-        runCallerClassLoaderClassesExample();
-        runIsolatedClassesExample();
+        runIsolationCallerClassLoaderClassesExample();
+        runIsolationIsolatedClassesExample();
+        runDangerousCode1Example();
+        runDangerousCode2Example();
     }
 
     private static void runHelloWorldExample() {
@@ -244,7 +246,7 @@ public class ScriptEngineExample {
         }
     }
 
-    private static void runCallerClassLoaderClassesExample() {
+    private static void runIsolationCallerClassLoaderClassesExample() {
         try {
             ScriptEngineManager manager = new ScriptEngineManager();
             ScriptEngine engine = manager.getEngineByName("java");
@@ -268,18 +270,67 @@ public class ScriptEngineExample {
         }
     }
 
-    private static void runIsolatedClassesExample() {
+    private static void runIsolationIsolatedClassesExample() {
         try {
             ScriptEngineManager manager = new ScriptEngineManager();
             ScriptEngine engine = manager.getEngineByName("java");
             JavaScriptEngine javaScriptEngine = (JavaScriptEngine) engine;
 
-            javaScriptEngine.setIsolation(JavaScriptEngine.Isolation.Isolated);
+            javaScriptEngine.setIsolation(JavaScriptEngine.Isolation.IsolatedClassLoader);
 
             JavaCompiledScript compiledScript = javaScriptEngine.compile("" +
                     "import ch.obermuhlner.scriptengine.example.Person;" +
                     "public class Script {" +
                     "   public Object getPerson() {" +
+                    "       return 123;" +
+                    "   } " +
+                    "}");
+
+            Object result = compiledScript.eval();
+            System.out.println("Result: " + result);
+        } catch (ScriptException e) {
+            e.printStackTrace();
+        }
+    }
+
+
+    private static void runDangerousCode1Example() {
+        try {
+            ScriptEngineManager manager = new ScriptEngineManager();
+            ScriptEngine engine = manager.getEngineByName("java");
+            JavaScriptEngine javaScriptEngine = (JavaScriptEngine) engine;
+
+            javaScriptEngine.setIsolation(JavaScriptEngine.Isolation.IsolatedClassLoader);
+
+            JavaCompiledScript compiledScript = javaScriptEngine.compile("" +
+                    "import ch.obermuhlner.scriptengine.example.Person;" +
+                    "public class Script {" +
+                    "   public String getJavaHome() {" +
+                    "       return System.getProperty(\"java.home\");" +
+                    "   } " +
+                    "}");
+
+            Object result = compiledScript.eval();
+            System.out.println("Result: " + result);
+        } catch (ScriptException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private static void runDangerousCode2Example() {
+        try {
+            ScriptEngineManager manager = new ScriptEngineManager();
+            ScriptEngine engine = manager.getEngineByName("java");
+            JavaScriptEngine javaScriptEngine = (JavaScriptEngine) engine;
+
+            javaScriptEngine.setIsolation(JavaScriptEngine.Isolation.IsolatedClassLoader);
+
+            JavaCompiledScript compiledScript = javaScriptEngine.compile("" +
+                    "import ch.obermuhlner.scriptengine.example.Person;" +
+                    "public class Script {" +
+                    "   public Object getPerson() {" +
+                    "       System.out.println(\"Calling System.exit(111)\");" +
+                    "       System.exit(111);" +
                     "       return 123;" +
                     "   } " +
                     "}");
