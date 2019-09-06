@@ -301,6 +301,7 @@ public class ScriptEngineExample {
             ScriptEngine engine = manager.getEngineByName("java");
             JavaScriptEngine javaScriptEngine = (JavaScriptEngine) engine;
 
+            javaScriptEngine.setExecutionClassLoader(ScriptEngineExample.class.getClassLoader());
             javaScriptEngine.setIsolation(Isolation.IsolatedClassLoader);
 
             JavaCompiledScript compiledScript = javaScriptEngine.compile("" +

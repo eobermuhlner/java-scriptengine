@@ -1,11 +1,6 @@
 # API changes
 
-No API changes.
-
-
-# Bugfixes
-
-No Bugfix changes.
+No breaking API changes.
 
 
 # Enhancements
@@ -13,6 +8,11 @@ No Bugfix changes.
 ## Added `Example.method(y)`
 
 Added `Example.method(y)` 
+
+
+# Bugfixes
+
+No Bugfix changes.
 
 
 # Examples

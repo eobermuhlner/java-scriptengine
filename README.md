@@ -189,7 +189,7 @@ Variable2 message: Hello world
 Variable2 counter: 3
 ```
 
-## ![Next Release](https://badgen.net/badge/Available/next%20release/orange) Using application classes from script
+## Using application classes from script
 
 The script can see classes of the calling application.
 
@@ -427,7 +427,7 @@ try {
 }
 ```
 
-### ![Next Release](https://badgen.net/badge/Available/next%20release/orange) Set `Isolation` in `JavaScriptEngine`
+### Set `Isolation` in `JavaScriptEngine`
 
 You can specfy the `Isolation` level of the script.
 
@@ -439,7 +439,7 @@ You can specfy the `Isolation` level of the script.
 The default behaviour is `Isolation.CallerClassLoader`.
 
 
-### ![Next Release](https://badgen.net/badge/Available/next%20release/orange) Special `codeBase` for permission policy
+### Special `codeBase` for permission policy
 
 The script classes are executed using a special `codeBase`: 
 `jrt:/ch.obermuhlner.scriptengine.java/memory-class` 
