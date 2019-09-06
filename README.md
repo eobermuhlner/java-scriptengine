@@ -415,7 +415,7 @@ try {
             "}");
 
     compiledScript.setExecutionStrategy(MethodExecutionStrategy.byMatchingArguments(
-            compiledScript.getInstanceClass(),
+            compiledScript.getCompiledClass(),
             "getMessage",
             "Hello", 42));
 
