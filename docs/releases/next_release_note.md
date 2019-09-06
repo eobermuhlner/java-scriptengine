@@ -1,5 +1,21 @@
 # API changes
 
+No API changes.
+
+
+# Bugfixes
+
+## Fix javadoc in `MethodExecutionStrategy` `byArgumentTypes()` and `byMatchingArguments()`
+
+The javadoc for the methods
+* `MethodExecutionStrategy.byArgumentTypes()`
+* `MethodExecutionStrategy.byMatchingArguments()`
+
+described the return value wrong.
+
+
+# Enhancements
+
 ## Control visible classes of script during execution (Isolation)
 
 In previous releases the classloader of the caller was not visible
@@ -24,10 +40,17 @@ Renamed the following methods:
 * `JavaCompiledScript.getInstanceClass()` to `getCompiledClass()` 
 * `JavaCompiledScript.getInstance()` to `getCompiledInstance()` 
 
+For backwards compatibility the old methods are still available
+but marked as `@Deprecated`.
+They old methods will be removed with the next major release. 
 
-## Java Module (Jigsaw)
 
-The java-scriptengine is now a fully compliant Java module.
+## Preparation for Java Module (Jigsaw)
+
+In preparation for future support of Java Modules (Jigsaw) the `java-scriptengine` is now a Java module.
+
+Important: If the application is a Java Module then the `java.scriptengine` cannot see classes in the application
+(in other words `Isolation.CallerClassLoader` does not work correctly).
 
 ```
 module ch.obermuhlner.scriptengine.java {
@@ -101,20 +124,6 @@ grant codeBase "jrt:/jdk.compiler" {
   permission java.util.PropertyPermission "java.home", "read";
 };
 ```
-
-
-# Bugfixes
-
-## Fix javadoc in `MethodExecutionStrategy` `byArgumentTypes()` and `byMatchingArguments()`
-
-The javadoc for the methods
-* `MethodExecutionStrategy.byArgumentTypes()`
-* `MethodExecutionStrategy.byMatchingArguments()`
-
-described the return value wrong.
-
-
-# Enhancements
 
 ## Added `MethodExecutionStrategy.byMainMethod()`
 

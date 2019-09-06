@@ -54,6 +54,32 @@ public class JavaCompiledScript extends CompiledScript {
     }
 
     /**
+     * Returns the compiled {@link Class}.
+     *
+     * @return the compiled {@link Class}.
+     * @deprecated in release 1.1.0 this method was deprecated,
+     *             use {@link #getCompiledClass()} instead.
+     */
+    @Deprecated(since = "1.1.0", forRemoval = true)
+    public Class<?> getInstanceClass() {
+        return getCompiledClass();
+    }
+
+    /**
+     * Returns the instance of the compiled {@link Class}.
+     *
+     * @return the instance of the compiled {@link Class} or {@code null}
+     *         if no instance was created and only static methods will be called
+     *         by the the {@link ExecutionStrategy}.
+     * @deprecated in release 1.1.0 this method was deprecated,
+     *             use {@link #getCompiledInstance()} instead.
+     */
+    @Deprecated(since = "1.1.0", forRemoval = true)
+    public Object getInstance() {
+        return getCompiledInstance();
+    }
+
+    /**
      * Sets the {@link ExecutionStrategy} to be used when evaluating the compiled class instance.
      *
      * @param executionStrategy the {@link ExecutionStrategy}
