@@ -22,9 +22,7 @@ The script source is a standard Java class that out of the box must follow these
 
 The script class can be arbitrarily named and may be in a named package or the default package.
 
-Note: The scanner that parses the script for package and class names is very simple.
-Avoid confusing it with comments that contain the keywords `package` or `public class`
-or comments between the keywords and the package/class names.
+The `java-scriptengine` needs Java 11 or later to run.
 
 ## Using Java scripting engine in your projects 
 
@@ -81,13 +79,24 @@ The console output shows the result of the only method in the `Script` class.
 Result: Hello World
 ```
 
+While example was written to be the simplest and easiest way to run
+a Java script, it is *not* the best way! Please have a look at
+the next chapter before you start integrating it into your application.  
+
+
 ## Compiling
 
-Calling `ScriptEngine.eval()` multiple times is very efficient because
+Calling `ScriptEngine.eval()` multiple times is very inefficient because
 the same script has to be compiled every time.
 
 The `JavaScriptEngine` implements the `Compilable` interface which
 allows to compile the script once and run it multiple times.
+
+The following example also shows the recommended best practices for writing scripts:
+* declare a package (to avoid the unnamed package)
+* script class implements `java.util.function.Supplier<String>`
+  (to avoid ambiguities on the method to call)
+   
 
 ```java
 try {
@@ -96,9 +105,11 @@ try {
     Compilable compiler = (Compilable) engine;
 
     CompiledScript compiledScript = compiler.compile("" +
-            "public class Script {" +
+            "package script;" +
+            "public class Script implements java.util.function.Supplier<String> {" +
             "   private int counter = 1;" +
-            "   public String getMessage() {" +
+            "   @Override" +
+            "   public String get() {" +
             "       return \"Hello World #\" + counter++;" +
             "   } " +
             "}");
@@ -238,6 +249,22 @@ The console output shows that the script was able to use class `Person`.
 ```console
 Result: Person{name=Eric, birthYear=1967}
 ```
+
+
+## Using `JavaScriptEngine` in module systems
+
+Module systems such as Java Modules (Jigsaw) and OSGi use special
+class loaders to hide classes from modules that
+are not allowed to see them.
+
+Because `JavaScriptEngine` uses the `java.compiler` API there are
+currently some limitations and special cases to consider when
+running in a module system.
+   
+### Using `JavaScriptEngine` in Java Modules (Jigsaw)
+
+
+### Using `JavaScriptEngine` in OSGi
 
 
 ## Advanced features of `JavaScriptEngine`
