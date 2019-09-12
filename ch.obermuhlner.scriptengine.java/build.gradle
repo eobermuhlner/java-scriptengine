@@ -20,7 +20,7 @@ ext {
 		ossrhUsername = "undefined"
 	}
 	if (!project.hasProperty("ossrhPassword")) {
-		ossrhPassword="undefined"
+		ossrhPassword = "undefined"
 	}
 }
 
@@ -60,7 +60,8 @@ check.dependsOn jacocoTestReport
 jar {
     manifest {
         attributes(
-                "Bundle-ManifestVersion": 2,
+				"Automatic-Module-Name": moduleName,
+				"Bundle-ManifestVersion": 2,
                 "Bundle-Name": archivesBaseName,
                 "Bundle-SymbolicName": moduleName,
                 "Bundle-Version": version,
