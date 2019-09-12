@@ -60,7 +60,7 @@ public class JavaCompiledScript extends CompiledScript {
      * @deprecated in release 1.1.0 this method was deprecated,
      *             use {@link #getCompiledClass()} instead.
      */
-    @Deprecated(since = "1.1.0", forRemoval = true)
+    @Deprecated
     public Class<?> getInstanceClass() {
         return getCompiledClass();
     }
@@ -74,7 +74,7 @@ public class JavaCompiledScript extends CompiledScript {
      * @deprecated in release 1.1.0 this method was deprecated,
      *             use {@link #getCompiledInstance()} instead.
      */
-    @Deprecated(since = "1.1.0", forRemoval = true)
+    @Deprecated
     public Object getInstance() {
         return getCompiledInstance();
     }

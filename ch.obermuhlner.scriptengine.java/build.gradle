@@ -11,6 +11,8 @@ group = 'ch.obermuhlner'
 version = '1.1.0'
 archivesBaseName = 'java-scriptengine'
 
+sourceCompatibility = '1.8'
+
 ext {
     moduleName = "ch.obermuhlner.scriptengine.java"
 
