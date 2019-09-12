@@ -6,26 +6,17 @@ grant {
   permission java.util.PropertyPermission "env.class.path", "read";
   permission java.util.PropertyPermission "java.class.path", "read";
   permission java.util.PropertyPermission "java.home", "read";
+  permission java.util.PropertyPermission "java.endorsed.dirs", "read";
+  permission java.util.PropertyPermission "java.ext.dirs", "read";
+  permission java.util.PropertyPermission "nonBatchMode", "read";
+  permission java.util.PropertyPermission "sun.boot.class.path", "read";
+  permission java.util.PropertyPermission "sun.tools.ToolProvider", "read";
 };
-
-// GeneratePolicyFromDeniedPermissions - timestamp: Thu Sep 12 10:02:18 CEST 2019
 
 grant codeBase "file:/C:/Program%20Files/Java/jdk1.8.0_171/lib/tools.jar" {
   permission java.lang.RuntimePermission "closeClassLoader";
   permission java.lang.RuntimePermission "createClassLoader";
   permission java.lang.reflect.ReflectPermission "suppressAccessChecks";
-  permission java.util.PropertyPermission "application.home", "read";
-  permission java.util.PropertyPermission "env.class.path", "read";
-  permission java.util.PropertyPermission "java.class.path", "read";
-  permission java.util.PropertyPermission "java.endorsed.dirs", "read";
-  permission java.util.PropertyPermission "java.ext.dirs", "read";
-  permission java.util.PropertyPermission "nonBatchMode", "read";
-  permission java.util.PropertyPermission "sun.boot.class.path", "read";
-};
-
-grant codeBase "file:/C:/Program%20Files/JetBrains/IntelliJ%20IDEA%20Community%20Edition%202019.2.2/lib/idea_rt.jar" {
-  permission java.lang.RuntimePermission "loadLibrary.C:\Program Files\JetBrains\IntelliJ IDEA Community Edition 2019.2.2\bin\breakgen64.dll";
-  permission java.net.SocketPermission "127.0.0.1:52316", "connect,resolve";
 };
 
 grant codeBase "file:/C:/Users/obe/git/java-scriptengine/ch.obermuhlner.scriptengine.example/out/production/classes/" {
@@ -33,15 +24,6 @@ grant codeBase "file:/C:/Users/obe/git/java-scriptengine/ch.obermuhlner.scripten
   permission java.lang.RuntimePermission "closeClassLoader";
   permission java.lang.RuntimePermission "createClassLoader";
   permission java.lang.reflect.ReflectPermission "suppressAccessChecks";
-  permission java.util.PropertyPermission "application.home", "read";
-  permission java.util.PropertyPermission "env.class.path", "read";
-  permission java.util.PropertyPermission "java.class.path", "read";
-  permission java.util.PropertyPermission "java.endorsed.dirs", "read";
-  permission java.util.PropertyPermission "java.ext.dirs", "read";
-  permission java.util.PropertyPermission "java.home", "read";
-  permission java.util.PropertyPermission "nonBatchMode", "read";
-  permission java.util.PropertyPermission "sun.boot.class.path", "read";
-  permission java.util.PropertyPermission "sun.tools.ToolProvider", "read";
 };
 
 grant codeBase "file:/C:/Users/obe/git/java-scriptengine/ch.obermuhlner.scriptengine.java/out/production/classes/" {
@@ -49,20 +31,8 @@ grant codeBase "file:/C:/Users/obe/git/java-scriptengine/ch.obermuhlner.scripten
   permission java.lang.RuntimePermission "closeClassLoader";
   permission java.lang.RuntimePermission "createClassLoader";
   permission java.lang.reflect.ReflectPermission "suppressAccessChecks";
-  permission java.util.PropertyPermission "application.home", "read";
-  permission java.util.PropertyPermission "env.class.path", "read";
-  permission java.util.PropertyPermission "java.class.path", "read";
-  permission java.util.PropertyPermission "java.endorsed.dirs", "read";
-  permission java.util.PropertyPermission "java.ext.dirs", "read";
-  permission java.util.PropertyPermission "java.home", "read";
-  permission java.util.PropertyPermission "nonBatchMode", "read";
-  permission java.util.PropertyPermission "sun.boot.class.path", "read";
-  permission java.util.PropertyPermission "sun.tools.ToolProvider", "read";
 };
 
 grant codeBase "http://ch.obermuhlner/ch.obermuhlner.scriptengine.java/memory-class" {
-  //permission java.lang.RuntimePermission "exitVM.111";
-  permission java.util.PropertyPermission "java.home", "read";
+  permission java.lang.RuntimePermission "exitVM.111";
 };
-
-// GeneratePolicyFromDeniedPermissions - That's all
