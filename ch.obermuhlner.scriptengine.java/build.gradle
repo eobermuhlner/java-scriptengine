@@ -8,7 +8,7 @@ plugins {
 }
 
 group = 'ch.obermuhlner'
-version = '1.1.0'
+version = '1.2.0-backport_java8'
 archivesBaseName = 'java-scriptengine'
 
 sourceCompatibility = '1.8'
@@ -65,7 +65,12 @@ jar {
                 "Bundle-Name": archivesBaseName,
                 "Bundle-SymbolicName": moduleName,
                 "Bundle-Version": version,
-                "Export-Package": "ch.obermuhlner.scriptengine.java, ch.obermuhlner.scriptengine.java.constructor, ch.obermuhlner.scriptengine.java.execution, ch.obermuhlner.scriptengine.java.name, ch.obermuhlner.scriptengine.java.util")
+                "Export-Package": "" +
+						"ch.obermuhlner.scriptengine.java, " +
+						"ch.obermuhlner.scriptengine.java.constructor, " +
+						"ch.obermuhlner.scriptengine.java.execution, " +
+						"ch.obermuhlner.scriptengine.java.name, " +
+						"ch.obermuhlner.scriptengine.java.util")
     }
 }
 
