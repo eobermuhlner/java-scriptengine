@@ -5,9 +5,7 @@ No breaking API changes.
 
 # Enhancements
 
-## Added `Example.method(y)`
-
-Added `Example.method(y)` 
+No enhancements.
 
 
 # Bugfixes
