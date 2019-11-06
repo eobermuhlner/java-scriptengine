@@ -8,7 +8,7 @@ plugins {
 }
 
 group = 'ch.obermuhlner'
-version = '1.2.0-backport_java8-SNAPSHOT'
+version = '2.0.0'
 archivesBaseName = 'java-scriptengine'
 
 sourceCompatibility = '1.8'
