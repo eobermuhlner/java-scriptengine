@@ -22,7 +22,7 @@ The script source is a standard Java class that out of the box must follow these
 
 The script class can be arbitrarily named and may be in a named package or the default package.
 
-The `java-scriptengine` needs Java 11 or later to run.
+The `java-scriptengine` needs Java 8 or later to run.
 
 ## Using Java scripting engine in your projects 
 
@@ -453,11 +453,120 @@ The default behaviour is `Isolation.CallerClassLoader`.
 ### Special `codeBase` for permission policy
 
 The script classes are executed using a special `codeBase`: 
-`jrt:/ch.obermuhlner.scriptengine.java/memory-class` 
+`http://ch.obermuhlner/ch.obermuhlner.scriptengine.java/memory-class` 
 
 This allows to grant specific permissions to the script classes.
 
-Here an example policy file `example.policy` (you will need to edit the file path to the application classes in your installation): 
+Here an example policy file `example.policy` when running in Java 8 (you will need to edit the file path to the application classes in your installation): 
+```
+// global permissions (for the application and on-the-fly compiled script classes)
+grant {
+  permission java.io.FilePermission "<<ALL FILES>>", "read";
+
+  permission java.util.PropertyPermission "application.home", "read";
+  permission java.util.PropertyPermission "env.class.path", "read";
+  permission java.util.PropertyPermission "java.class.path", "read";
+  permission java.util.PropertyPermission "java.home", "read";
+  permission java.util.PropertyPermission "java.endorsed.dirs", "read";
+  permission java.util.PropertyPermission "java.ext.dirs", "read";
+  permission java.util.PropertyPermission "nonBatchMode", "read";
+  permission java.util.PropertyPermission "sun.boot.class.path", "read";
+  permission java.util.PropertyPermission "sun.tools.ToolProvider", "read";
+};
+
+grant codeBase "file:/C:/Program%20Files/Java/jdk1.8.0_171/lib/tools.jar" {
+  permission java.lang.RuntimePermission "closeClassLoader";
+  permission java.lang.RuntimePermission "createClassLoader";
+  permission java.lang.reflect.ReflectPermission "suppressAccessChecks";
+};
+
+grant codeBase "file:/C:/Users/obe/git/java-scriptengine/ch.obermuhlner.scriptengine.example/out/production/classes/" {
+  permission java.lang.RuntimePermission "accessDeclaredMembers";
+  permission java.lang.RuntimePermission "closeClassLoader";
+  permission java.lang.RuntimePermission "createClassLoader";
+  permission java.lang.reflect.ReflectPermission "suppressAccessChecks";
+};
+
+grant codeBase "file:/C:/Users/obe/git/java-scriptengine/ch.obermuhlner.scriptengine.java/out/production/classes/" {
+  permission java.lang.RuntimePermission "accessDeclaredMembers";
+  permission java.lang.RuntimePermission "closeClassLoader";
+  permission java.lang.RuntimePermission "createClassLoader";
+  permission java.lang.reflect.ReflectPermission "suppressAccessChecks";
+};
+
+// permissions for on-the-fly compiled script classes (notice the special URL)
+grant codeBase "http://ch.obermuhlner/ch.obermuhlner.scriptengine.java/memory-class" {
+  permission java.lang.RuntimePermission "exitVM.111";
+};
+```
+
+Add the following VM arguments to your application launch:
+`-Djava.security.manager -Djava.security.policy=path/to/example.policy`
+
+The permission given to the `http://ch.obermuhlner/ch.obermuhlner.scriptengine.java/memory-class`
+allow to execute the dangerous `System.exit()` in the following example:
+
+```java
+try {
+    ScriptEngineManager manager = new ScriptEngineManager();
+    ScriptEngine engine = manager.getEngineByName("java");
+    JavaScriptEngine javaScriptEngine = (JavaScriptEngine) engine;
+
+    javaScriptEngine.setIsolation(Isolation.IsolatedClassLoader);
+
+    JavaCompiledScript compiledScript = javaScriptEngine.compile("" +
+            "import ch.obermuhlner.scriptengine.example.Person;" +
+            "public class Script {" +
+            "   public Object getPerson() {" +
+            "       System.out.println(\"Calling System.exit(111)\");" +
+            "       System.exit(111);" +
+            "       return 123;" +
+            "   } " +
+            "}");
+
+    Object result = compiledScript.eval();
+    System.out.println("Result: " + result);
+} catch (ScriptException e) {
+    e.printStackTrace();
+}
+```
+
+The console output shows that the entire application exited before printing out the result.
+```console
+Calling System.exit(111)
+```
+
+Remove the granted permission for `http://ch.obermuhlner/ch.obermuhlner.scriptengine.java/memory-class`
+in the `example.policy` file to prohibit the dangerous `System.exit()`.
+
+```console
+Calling System.exit(111)
+javax.script.ScriptException: java.lang.reflect.InvocationTargetException
+	at ch.obermuhlner.scriptengine.java.execution.DefaultExecutionStrategy.execute(DefaultExecutionStrategy.java:52)
+	at ch.obermuhlner.scriptengine.java.JavaCompiledScript.eval(JavaCompiledScript.java:76)
+	at java.scripting/javax.script.CompiledScript.eval(CompiledScript.java:103)
+	at ch.obermuhlner.scriptengine.example.ScriptEngineExample.runDangerousCode2Example(ScriptEngineExample.java:339)
+	at ch.obermuhlner.scriptengine.example.ScriptEngineExample.runExamples(ScriptEngineExample.java:27)
+	at ch.obermuhlner.scriptengine.example.ScriptEngineExample.main(ScriptEngineExample.java:13)
+Caused by: java.lang.reflect.InvocationTargetException
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)
+	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:566)
+	at ch.obermuhlner.scriptengine.java.execution.DefaultExecutionStrategy.execute(DefaultExecutionStrategy.java:50)
+	... 5 more
+Caused by: java.security.AccessControlException: access denied ("java.lang.RuntimePermission" "exitVM.111")
+	at java.base/java.security.AccessControlContext.checkPermission(AccessControlContext.java:472)
+	at java.base/java.security.AccessController.checkPermission(AccessController.java:897)
+	at java.base/java.lang.SecurityManager.checkPermission(SecurityManager.java:322)
+	at java.base/java.lang.SecurityManager.checkExit(SecurityManager.java:534)
+	at java.base/java.lang.Runtime.exit(Runtime.java:113)
+	at java.base/java.lang.System.exit(System.java:1746)
+	at Script.getPerson(Script.java:1)
+	... 10 more
+```
+
+When running in a Java 11 environment the policy file will look quite different (you will need to edit the file path to the application classes in your installation):
 ```
 // global permissions (for the application and on-the-fly compiled script classes)
 grant {
@@ -492,74 +601,7 @@ grant codeBase "jrt:/jdk.compiler" {
 };
 
 // permissions for on-the-fly compiled script classes (notice the special URL)
-grant codeBase "jrt:/ch.obermuhlner.scriptengine.java/memory-class" {
+grant codeBase "http://ch.obermuhlner/ch.obermuhlner.scriptengine.java/memory-class" {
   permission java.lang.RuntimePermission "exitVM";
 };
 ```
-
-Add the following VM arguments to your application launch:
-`-Djava.security.manager -Djava.security.policy=path/to/example.policy`
-
-The permission given to the `jrt:/ch.obermuhlner.scriptengine.java/memory-class`
-allow to execute the dangerous `System.exit()` in the following example:
-
-```java
-try {
-    ScriptEngineManager manager = new ScriptEngineManager();
-    ScriptEngine engine = manager.getEngineByName("java");
-    JavaScriptEngine javaScriptEngine = (JavaScriptEngine) engine;
-
-    javaScriptEngine.setIsolation(Isolation.IsolatedClassLoader);
-
-    JavaCompiledScript compiledScript = javaScriptEngine.compile("" +
-            "import ch.obermuhlner.scriptengine.example.Person;" +
-            "public class Script {" +
-            "   public Object getPerson() {" +
-            "       System.out.println(\"Calling System.exit(111)\");" +
-            "       System.exit(111);" +
-            "       return 123;" +
-            "   } " +
-            "}");
-
-    Object result = compiledScript.eval();
-    System.out.println("Result: " + result);
-} catch (ScriptException e) {
-    e.printStackTrace();
-}
-```
-
-The console output shows that the entire application exited before printing out the result.
-```console
-Calling System.exit(111)
-```
-
-Remove the granted permission for `jrt:/ch.obermuhlner.scriptengine.java/memory-class`
-in the `example.policy` file to prohibit the dangerous `System.exit()`.
-
-```console
-Calling System.exit(111)
-javax.script.ScriptException: java.lang.reflect.InvocationTargetException
-	at ch.obermuhlner.scriptengine.java.execution.DefaultExecutionStrategy.execute(DefaultExecutionStrategy.java:52)
-	at ch.obermuhlner.scriptengine.java.JavaCompiledScript.eval(JavaCompiledScript.java:76)
-	at java.scripting/javax.script.CompiledScript.eval(CompiledScript.java:103)
-	at ch.obermuhlner.scriptengine.example.ScriptEngineExample.runDangerousCode2Example(ScriptEngineExample.java:339)
-	at ch.obermuhlner.scriptengine.example.ScriptEngineExample.runExamples(ScriptEngineExample.java:27)
-	at ch.obermuhlner.scriptengine.example.ScriptEngineExample.main(ScriptEngineExample.java:13)
-Caused by: java.lang.reflect.InvocationTargetException
-	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
-	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)
-	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
-	at java.base/java.lang.reflect.Method.invoke(Method.java:566)
-	at ch.obermuhlner.scriptengine.java.execution.DefaultExecutionStrategy.execute(DefaultExecutionStrategy.java:50)
-	... 5 more
-Caused by: java.security.AccessControlException: access denied ("java.lang.RuntimePermission" "exitVM.111")
-	at java.base/java.security.AccessControlContext.checkPermission(AccessControlContext.java:472)
-	at java.base/java.security.AccessController.checkPermission(AccessController.java:897)
-	at java.base/java.lang.SecurityManager.checkPermission(SecurityManager.java:322)
-	at java.base/java.lang.SecurityManager.checkExit(SecurityManager.java:534)
-	at java.base/java.lang.Runtime.exit(Runtime.java:113)
-	at java.base/java.lang.System.exit(System.java:1746)
-	at Script.getPerson(Script.java:1)
-	... 10 more
-```
-
