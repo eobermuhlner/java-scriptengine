@@ -11,7 +11,8 @@ repositories {
 dependencies {
     compile project(':ch.obermuhlner.scriptengine.java')
     //compile 'ch.obermuhlner:java-scriptengine:1.1.0'
-    compile 'net.sourceforge.pro-grade:pro-grade:1.1.1'
+
+    //compile 'net.sourceforge.pro-grade:pro-grade:1.1.1'
 
     testCompile 'junit:junit:4.12'
 }
