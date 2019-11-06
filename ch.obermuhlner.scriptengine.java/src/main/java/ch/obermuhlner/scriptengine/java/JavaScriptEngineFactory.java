@@ -16,7 +16,7 @@ public class JavaScriptEngineFactory implements ScriptEngineFactory {
 
     @Override
     public String getEngineVersion() {
-        return "1.1.0";
+        return "2.0.0";
     }
 
     @Override
