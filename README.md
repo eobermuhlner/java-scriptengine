@@ -251,22 +251,6 @@ Result: Person{name=Eric, birthYear=1967}
 ```
 
 
-## Using `JavaScriptEngine` in module systems
-
-Module systems such as Java Modules (Jigsaw) and OSGi use special
-class loaders to hide classes from modules that
-are not allowed to see them.
-
-Because `JavaScriptEngine` uses the `java.compiler` API there are
-currently some limitations and special cases to consider when
-running in a module system.
-   
-### Using `JavaScriptEngine` in Java Modules (Jigsaw)
-
-
-### Using `JavaScriptEngine` in OSGi
-
-
 ## Advanced features of `JavaScriptEngine`
 
 The `JavaScriptEngine` has an additional API to control

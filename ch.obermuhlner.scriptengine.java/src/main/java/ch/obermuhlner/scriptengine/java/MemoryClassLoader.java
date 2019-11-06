@@ -20,7 +20,7 @@ grant codeBase "jrt:/ch.obermuhlner.scriptengine.java/memory-class" {
 };
      * </pre>
      */
-    public static final String MEMORY_CLASS_URL = "jrt:/ch.obermuhlner.scriptengine.java/memory-class";
+    public static final String MEMORY_CLASS_URL = "http://ch.obermuhlner/ch.obermuhlner.scriptengine.java/memory-class";
 
     private ProtectionDomain protectionDomain;
     private Map<String, byte[]> mapClassBytes;

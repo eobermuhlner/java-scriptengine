@@ -1,0 +1,38 @@
+// global permissions (for the application and on-the-fly compiled script classes)
+grant {
+  permission java.io.FilePermission "<<ALL FILES>>", "read";
+
+  permission java.util.PropertyPermission "application.home", "read";
+  permission java.util.PropertyPermission "env.class.path", "read";
+  permission java.util.PropertyPermission "java.class.path", "read";
+  permission java.util.PropertyPermission "java.home", "read";
+  permission java.util.PropertyPermission "java.endorsed.dirs", "read";
+  permission java.util.PropertyPermission "java.ext.dirs", "read";
+  permission java.util.PropertyPermission "nonBatchMode", "read";
+  permission java.util.PropertyPermission "sun.boot.class.path", "read";
+  permission java.util.PropertyPermission "sun.tools.ToolProvider", "read";
+};
+
+grant codeBase "file:/C:/Program%20Files/Java/jdk1.8.0_171/lib/tools.jar" {
+  permission java.lang.RuntimePermission "closeClassLoader";
+  permission java.lang.RuntimePermission "createClassLoader";
+  permission java.lang.reflect.ReflectPermission "suppressAccessChecks";
+};
+
+grant codeBase "file:/C:/Users/obe/git/java-scriptengine/ch.obermuhlner.scriptengine.example/out/production/classes/" {
+  permission java.lang.RuntimePermission "accessDeclaredMembers";
+  permission java.lang.RuntimePermission "closeClassLoader";
+  permission java.lang.RuntimePermission "createClassLoader";
+  permission java.lang.reflect.ReflectPermission "suppressAccessChecks";
+};
+
+grant codeBase "file:/C:/Users/obe/git/java-scriptengine/ch.obermuhlner.scriptengine.java/out/production/classes/" {
+  permission java.lang.RuntimePermission "accessDeclaredMembers";
+  permission java.lang.RuntimePermission "closeClassLoader";
+  permission java.lang.RuntimePermission "createClassLoader";
+  permission java.lang.reflect.ReflectPermission "suppressAccessChecks";
+};
+
+grant codeBase "http://ch.obermuhlner/ch.obermuhlner.scriptengine.java/memory-class" {
+  permission java.lang.RuntimePermission "exitVM.111";
+};
