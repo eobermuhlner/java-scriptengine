@@ -25,6 +25,7 @@ public class JavaScriptEngine implements ScriptEngine, Compilable {
     private ConstructorStrategy constructorStrategy = DefaultConstructorStrategy.byDefaultConstructor();
     private ExecutionStrategyFactory executionStrategyFactory = clazz -> new DefaultExecutionStrategy(clazz);
     private Isolation isolation = Isolation.CallerClassLoader;
+    private List<String> compilationOptions = null;
 
     private ScriptContext context = new SimpleScriptContext();
 
@@ -73,6 +74,15 @@ public class JavaScriptEngine implements ScriptEngine, Compilable {
      */
     public void setIsolation(Isolation isolation) {
         this.isolation = isolation;
+    }
+
+    /**
+     * Sets options used in java compilation
+     *
+     * @param compilationOptions options to use in java compilation
+     */
+    public void setCompilationOptions(List<String> compilationOptions) {
+        this.compilationOptions = compilationOptions;
     }
 
     @Override
@@ -161,7 +171,8 @@ public class JavaScriptEngine implements ScriptEngine, Compilable {
 
         JavaFileObject scriptSource = memoryFileManager.createSourceFileObject(null, simpleClassName, script);
 
-        JavaCompiler.CompilationTask task = compiler.getTask(null, memoryFileManager, diagnostics, null, null, Arrays.asList(scriptSource));
+        JavaCompiler.CompilationTask task = compiler.getTask(null, memoryFileManager, diagnostics, compilationOptions,
+                null, Arrays.asList(scriptSource));
         if (!task.call()) {
             String message = diagnostics.getDiagnostics().stream()
                     .map(d -> d.toString())

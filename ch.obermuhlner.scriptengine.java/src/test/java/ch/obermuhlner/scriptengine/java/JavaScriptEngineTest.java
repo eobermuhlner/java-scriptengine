@@ -11,6 +11,7 @@ import javax.script.*;
 import java.io.IOException;
 import java.io.Reader;
 import java.io.StringReader;
+import java.util.Arrays;
 
 import static org.assertj.core.api.Assertions.*;
 
@@ -697,6 +698,26 @@ public class JavaScriptEngineTest {
                     "   XXX" +
                     "}");
         }).isInstanceOf(ScriptException.class);
+    }
+
+    @Test
+    public void testCompilationOptions() throws ScriptException {
+        ScriptEngineManager manager = new ScriptEngineManager();
+        ScriptEngine engine = manager.getEngineByName("java");
+        JavaScriptEngine javaScriptEngine = (JavaScriptEngine) engine;
+
+        javaScriptEngine.setCompilationOptions(Arrays.asList("-g:none"));
+
+        Reader reader = new StringReader("" +
+                "public class Script {" + System.lineSeparator() +
+                "   public String getLineNumber() {" + System.lineSeparator() +
+                "       StackTraceElement element = Thread.currentThread().getStackTrace()[1];" + System.lineSeparator() +
+                "       return element.getClassName() + \":\" + element.getLineNumber();" + System.lineSeparator() +
+                "   }" + System.lineSeparator() +
+                "}" + System.lineSeparator());
+        Object result = engine.eval(reader);
+        // debugging disabled so line numbers all report as -1
+        assertThat(result).isEqualTo("Script:-1");
     }
 
     public static class PublicClass {
