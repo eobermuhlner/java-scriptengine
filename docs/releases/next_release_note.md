@@ -5,7 +5,9 @@ No breaking API changes.
 
 # Enhancements
 
-No enhancements.
+## Add support for compilation options
+
+Support passthrough of options for the java compiler when compiling source files.
 
 
 # Bugfixes
