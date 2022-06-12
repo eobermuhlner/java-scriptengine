@@ -1,11 +1,13 @@
 package ch.obermuhlner.scriptengine.java;
 
+import ch.obermuhlner.scriptengine.java.bindings.BindingStrategy;
 import ch.obermuhlner.scriptengine.java.constructor.ConstructorStrategy;
 import ch.obermuhlner.scriptengine.java.constructor.DefaultConstructorStrategy;
 import ch.obermuhlner.scriptengine.java.execution.DefaultExecutionStrategy;
 import ch.obermuhlner.scriptengine.java.execution.ExecutionStrategy;
 import ch.obermuhlner.scriptengine.java.execution.ExecutionStrategyFactory;
 import ch.obermuhlner.scriptengine.java.name.NameStrategy;
+import ch.obermuhlner.scriptengine.java.packagelisting.PackageResourceListingStrategy;
 import ch.obermuhlner.scriptengine.java.name.DefaultNameStrategy;
 
 import javax.script.*;
@@ -26,6 +28,8 @@ public class JavaScriptEngine implements ScriptEngine, Compilable {
     private ExecutionStrategyFactory executionStrategyFactory = clazz -> new DefaultExecutionStrategy(clazz);
     private Isolation isolation = Isolation.CallerClassLoader;
     private List<String> compilationOptions = null;
+    private PackageResourceListingStrategy packageResourceListingStrategy = null;
+    private BindingStrategy bindingStrategy = null;
 
     private ScriptContext context = new SimpleScriptContext();
 
@@ -49,6 +53,16 @@ public class JavaScriptEngine implements ScriptEngine, Compilable {
         this.constructorStrategy = constructorStrategy;
     }
 
+    public void setPackageResourceListingStrategy(PackageResourceListingStrategy packageResourceListingStrategy) {
+    	this.packageResourceListingStrategy = packageResourceListingStrategy;
+    }
+
+    public void setBindingStrategy(BindingStrategy bindingStrategy) {
+    	this.bindingStrategy = bindingStrategy;
+    }
+    
+    
+    
     /**
      * Sets the factory for the execution strategy used to execute a method of a class instance.
      *
@@ -165,6 +179,7 @@ public class JavaScriptEngine implements ScriptEngine, Compilable {
         StandardJavaFileManager standardFileManager = compiler.getStandardFileManager(diagnostics, null, null);
         ClassLoader parentClassLoader = isolation == Isolation.CallerClassLoader ? executionClassLoader : null;
         MemoryFileManager memoryFileManager = new MemoryFileManager(standardFileManager, parentClassLoader);
+        memoryFileManager.setPackageResourceListingStrategy(packageResourceListingStrategy);
 
         String fullClassName = nameStrategy.getFullName(script);
         String simpleClassName = NameStrategy.extractSimpleName(fullClassName);
@@ -186,7 +201,7 @@ public class JavaScriptEngine implements ScriptEngine, Compilable {
             Class<?> clazz = classLoader.loadClass(fullClassName);
             Object instance = constructorStrategy.construct(clazz);
             ExecutionStrategy executionStrategy = executionStrategyFactory.create(clazz);
-            return new JavaCompiledScript(this, clazz, instance, executionStrategy);
+            return new JavaCompiledScript(this, clazz, instance, executionStrategy, bindingStrategy);
         } catch (ClassNotFoundException e) {
             throw new ScriptException(e);
         }

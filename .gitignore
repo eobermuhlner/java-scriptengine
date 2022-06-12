@@ -4,6 +4,10 @@
 build
 gradle.properties
 
+# maven stuff
+
+target
+
 # Eclipse IDE stuff
 
 .project

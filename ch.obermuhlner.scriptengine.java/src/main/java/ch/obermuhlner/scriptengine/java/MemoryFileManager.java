@@ -1,13 +1,18 @@
 package ch.obermuhlner.scriptengine.java;
 
+import ch.obermuhlner.scriptengine.java.packagelisting.PackageResourceListingStrategy;
 import ch.obermuhlner.scriptengine.java.util.CompositeIterator;
 
 import javax.tools.*;
+
+
 import java.io.*;
 import java.net.URI;
+import java.net.URL;
 import java.util.*;
 
 import static javax.tools.StandardLocation.CLASS_OUTPUT;
+import static javax.tools.StandardLocation.CLASS_PATH;
 
 /**
  * A {@link JavaFileManager} that manages some files in memory,
@@ -17,6 +22,8 @@ public class MemoryFileManager extends ForwardingJavaFileManager<JavaFileManager
 
     private final Map<String, ClassMemoryJavaFileObject> mapNameToClasses = new HashMap<>();
     private final ClassLoader parentClassLoader;
+    
+    private PackageResourceListingStrategy packageResourceListingStrategy = null;
 
     /**
      * Creates a MemoryJavaFileManager.
@@ -29,6 +36,11 @@ public class MemoryFileManager extends ForwardingJavaFileManager<JavaFileManager
 
         this.parentClassLoader = parentClassLoader;
     }
+    
+    public void setPackageResourceListingStrategy(PackageResourceListingStrategy packageResourceListingStrategy) {
+    	this.packageResourceListingStrategy = packageResourceListingStrategy;
+    }
+
 
     private Collection<ClassMemoryJavaFileObject> memoryClasses() {
         return mapNameToClasses.values();
@@ -74,13 +86,37 @@ public class MemoryFileManager extends ForwardingJavaFileManager<JavaFileManager
                     list.iterator(),
                     generatedClasses.iterator());
         }
+        else if (location == CLASS_PATH)
+        {
+        	if (packageResourceListingStrategy != null)
+        	{
+        		Collection<String> resources = packageResourceListingStrategy.listResources(packageName);
+        		
+                List<JavaFileObject> classPathClasses = new ArrayList<JavaFileObject>();
+                
+                for (JavaFileObject jfo : list)
+                {
+                	classPathClasses.add(jfo);
+                }
 
+                for (String resource : resources) {
+                	if (resource.endsWith(".class")) {
+                		JavaFileObject javaFileObject = new ClasspathMemoryJavaFileObject(parentClassLoader, resource);
+                		classPathClasses.add(javaFileObject);
+                	}
+                }
+                
+                return classPathClasses;
+        	}
+        }
+        
+    
         return list;
     }
 
     @Override
     public String inferBinaryName(JavaFileManager.Location location, JavaFileObject file) {
-        if (file instanceof ClassMemoryJavaFileObject) {
+        if (file instanceof AbstractMemoryJavaFileObject) {
             return file.getName();
         } else {
             return super.inferBinaryName(location, file);
@@ -132,6 +168,41 @@ public class MemoryFileManager extends ForwardingJavaFileManager<JavaFileManager
         }
     }
 
+    static class ClasspathMemoryJavaFileObject extends AbstractMemoryJavaFileObject {
+
+        String className;
+        String resource;
+        ClassLoader classLoader;
+
+        ClasspathMemoryJavaFileObject(ClassLoader classLoader, String resource) throws IOException {
+            super(resource, JavaFileObject.Kind.CLASS);
+
+            this.classLoader = classLoader;
+            this.resource = resource;
+
+            className = resource.substring(0, resource.lastIndexOf("."));
+            className = className.replace('/', '.');
+        }
+
+        @Override
+        public String getName() {
+            return className;
+        }
+
+        @Override
+        public InputStream openInputStream() throws IOException {
+            URL url = classLoader.getResource(resource);
+            InputStream is = url.openStream();
+            return is;
+        }
+
+        @Override
+        public OutputStream openOutputStream() throws IOException {
+            return super.openOutputStream();
+        }
+    }
+
+    
     static class ClassMemoryJavaFileObject extends AbstractMemoryJavaFileObject {
 
         private ByteArrayOutputStream byteOutputStream = new ByteArrayOutputStream();

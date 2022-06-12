@@ -4,7 +4,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>ch.obermuhlner</groupId>
   <artifactId>java-scriptengine</artifactId>
-  <version>1.0.1</version>
+  <version>2.1.0</version>
   <name>Java ScriptEngine</name>
   <description>Java script engine for Java as a scripting language.</description>
   <url>https://github.com/eobermuhlner/java-scriptengine</url>
@@ -26,6 +26,14 @@
     <developerConnection>scm:ssh://github.com:eobermuhlner/java-scriptengine.git</developerConnection>
     <url>https://github.com/eobermuhlner/java-scriptengine/</url>
   </scm>
+  
+
+	<properties>
+		<maven.compiler.target>1.8</maven.compiler.target>
+		<maven.compiler.source>1.8</maven.compiler.source>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+	</properties>  
+  
   <dependencies>
     <dependency>
       <groupId>junit</groupId>
