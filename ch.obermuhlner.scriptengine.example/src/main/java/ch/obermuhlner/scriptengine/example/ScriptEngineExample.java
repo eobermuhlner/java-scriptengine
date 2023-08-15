@@ -3,6 +3,7 @@ package ch.obermuhlner.scriptengine.example;
 import ch.obermuhlner.scriptengine.java.Isolation;
 import ch.obermuhlner.scriptengine.java.JavaCompiledScript;
 import ch.obermuhlner.scriptengine.java.JavaScriptEngine;
+import ch.obermuhlner.scriptengine.java.compilation.IncrementalCompilationStrategy;
 import ch.obermuhlner.scriptengine.java.constructor.DefaultConstructorStrategy;
 import ch.obermuhlner.scriptengine.java.execution.MethodExecutionStrategy;
 
@@ -21,6 +22,7 @@ public class ScriptEngineExample {
         runConstructorStrategyMatchingArgumentsExample();
         runMethodExecutionStrategyFactoryMatchingArgumentsExample();
         runCompiledMethodExecutionStrategyMatchingArgumentsExample();
+        runIncrementalCompilationExample();
         runIsolationCallerClassLoaderClassesExample();
         runIsolationIsolatedClassesExample();
         runDangerousCode1Example();
@@ -246,6 +248,36 @@ public class ScriptEngineExample {
             e.printStackTrace();
         }
     }
+    
+    private static void runIncrementalCompilationExample() {
+        try {
+            ScriptEngineManager manager = new ScriptEngineManager();
+            ScriptEngine engine = manager.getEngineByName("java");
+            JavaScriptEngine javaScriptEngine = (JavaScriptEngine) engine;
+            javaScriptEngine.setCompilationSrategy(new IncrementalCompilationStrategy());
+            Compilable compiler = (Compilable) engine;
+
+            CompiledScript compiledLibrary = compiler.compile("" +
+                    "public class MyLibrary {" +
+                    "   public static String getMessage() {" +
+                    "       return \"Hello World #\";" +
+                    "   } " +
+                    "}");
+
+            CompiledScript compiledScript = compiler.compile("" +
+                    "public class MyScript {" +
+                    "   public String exec() {" +
+                    "       return MyLibrary.getMessage();" +
+                    "   } " +
+                    "}");
+
+            Object result2 = compiledScript.eval();
+            System.out.println("Result of calling library: " + result2);
+        } catch (ScriptException e) {
+            e.printStackTrace();
+        }
+    }
+    
 
     private static void runIsolationCallerClassLoaderClassesExample() {
         try {
