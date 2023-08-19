@@ -438,7 +438,7 @@ try {
 }
 ```
 
-### Set `CompilationStrategy` in `JavaCompiledScript`
+### Set `CompilationStrategy` in `JavaScriptEngine`
 
 You can specify the strategy to choose which files to compile alongside your script.
 
