@@ -455,6 +455,21 @@ The default implementation `DefaultCompilationStrategy` compiles only the curren
 An `IncrementalCompilationStrategy` is available and keeps the previous source files used in the same `JavaScriptEngine`.
 
 
+### Set `ScriptInterceptorStrategy` in `JavaScriptEngine`
+
+You can intercept the code just before the compilation to modify it.
+
+```java
+public interface ScriptInterceptorStrategy {
+
+    public String intercept(String script);
+    
+}
+```
+
+The default implementation `NoInterceptorStrategy` does not modify the script.
+
+
 ### Set `Isolation` in `JavaScriptEngine`
 
 You can specfy the `Isolation` level of the script.

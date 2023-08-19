@@ -3,6 +3,8 @@ package ch.obermuhlner.scriptengine.java;
 import ch.obermuhlner.scriptengine.java.bindings.BindingStrategy;
 import ch.obermuhlner.scriptengine.java.compilation.CompilationStrategy;
 import ch.obermuhlner.scriptengine.java.compilation.DefaultCompilationStrategy;
+import ch.obermuhlner.scriptengine.java.compilation.NoInterceptorStrategy;
+import ch.obermuhlner.scriptengine.java.compilation.ScriptInterceptorStrategy;
 import ch.obermuhlner.scriptengine.java.constructor.ConstructorStrategy;
 import ch.obermuhlner.scriptengine.java.constructor.DefaultConstructorStrategy;
 import ch.obermuhlner.scriptengine.java.execution.DefaultExecutionStrategy;
@@ -33,6 +35,7 @@ public class JavaScriptEngine implements ScriptEngine, Compilable {
     private PackageResourceListingStrategy packageResourceListingStrategy = null;
     private BindingStrategy bindingStrategy = null;
     private CompilationStrategy compilationStrategy = new DefaultCompilationStrategy();
+    private ScriptInterceptorStrategy scriptInterceptorStrategy = new NoInterceptorStrategy();
 
     private ScriptContext context = new SimpleScriptContext();
 
@@ -57,15 +60,19 @@ public class JavaScriptEngine implements ScriptEngine, Compilable {
     }
 
     public void setPackageResourceListingStrategy(PackageResourceListingStrategy packageResourceListingStrategy) {
-    	this.packageResourceListingStrategy = packageResourceListingStrategy;
+        this.packageResourceListingStrategy = packageResourceListingStrategy;
     }
 
     public void setBindingStrategy(BindingStrategy bindingStrategy) {
-    	this.bindingStrategy = bindingStrategy;
+        this.bindingStrategy = bindingStrategy;
     }
 
-    public void setCompilationSrategy(CompilationStrategy compilationStrategy) {
+    public void setCompilationStrategy(CompilationStrategy compilationStrategy) {
         this.compilationStrategy = compilationStrategy;
+    }
+
+    public void setScriptInterceptorStrategy(ScriptInterceptorStrategy scriptInterceptorStrategy) {
+        this.scriptInterceptorStrategy = scriptInterceptorStrategy;
     }
 
     /**
@@ -178,7 +185,10 @@ public class JavaScriptEngine implements ScriptEngine, Compilable {
     }
 
     @Override
-    public JavaCompiledScript compile(String script) throws ScriptException {
+    public JavaCompiledScript compile(String originalScript) throws ScriptException {
+
+        String script = scriptInterceptorStrategy.intercept(originalScript);
+
         JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
         DiagnosticCollector<JavaFileObject> diagnostics = new DiagnosticCollector<>();
         StandardJavaFileManager standardFileManager = compiler.getStandardFileManager(diagnostics, null, null);
