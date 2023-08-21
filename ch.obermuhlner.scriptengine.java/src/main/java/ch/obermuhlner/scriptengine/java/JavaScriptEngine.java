@@ -1,6 +1,8 @@
 package ch.obermuhlner.scriptengine.java;
 
 import ch.obermuhlner.scriptengine.java.bindings.BindingStrategy;
+import ch.obermuhlner.scriptengine.java.compilation.CompilationStrategy;
+import ch.obermuhlner.scriptengine.java.compilation.DefaultCompilationStrategy;
 import ch.obermuhlner.scriptengine.java.constructor.ConstructorStrategy;
 import ch.obermuhlner.scriptengine.java.constructor.DefaultConstructorStrategy;
 import ch.obermuhlner.scriptengine.java.execution.DefaultExecutionStrategy;
@@ -30,6 +32,7 @@ public class JavaScriptEngine implements ScriptEngine, Compilable {
     private List<String> compilationOptions = null;
     private PackageResourceListingStrategy packageResourceListingStrategy = null;
     private BindingStrategy bindingStrategy = null;
+    private CompilationStrategy compilationStrategy = new DefaultCompilationStrategy();
 
     private ScriptContext context = new SimpleScriptContext();
 
@@ -60,9 +63,11 @@ public class JavaScriptEngine implements ScriptEngine, Compilable {
     public void setBindingStrategy(BindingStrategy bindingStrategy) {
     	this.bindingStrategy = bindingStrategy;
     }
-    
-    
-    
+
+    public void setCompilationSrategy(CompilationStrategy compilationStrategy) {
+        this.compilationStrategy = compilationStrategy;
+    }
+
     /**
      * Sets the factory for the execution strategy used to execute a method of a class instance.
      *
@@ -184,10 +189,10 @@ public class JavaScriptEngine implements ScriptEngine, Compilable {
         String fullClassName = nameStrategy.getFullName(script);
         String simpleClassName = NameStrategy.extractSimpleName(fullClassName);
 
-        JavaFileObject scriptSource = memoryFileManager.createSourceFileObject(null, simpleClassName, script);
+        List<JavaFileObject> toCompile = compilationStrategy.getJavaFileObjectsToCompile(simpleClassName, script);
 
         JavaCompiler.CompilationTask task = compiler.getTask(null, memoryFileManager, diagnostics, compilationOptions,
-                null, Arrays.asList(scriptSource));
+                null, toCompile);
         if (!task.call()) {
             String message = diagnostics.getDiagnostics().stream()
                     .map(d -> d.toString())
@@ -199,6 +204,7 @@ public class JavaScriptEngine implements ScriptEngine, Compilable {
 
         try {
             Class<?> clazz = classLoader.loadClass(fullClassName);
+            compilationStrategy.compilationResult(clazz);
             Object instance = constructorStrategy.construct(clazz);
             ExecutionStrategy executionStrategy = executionStrategyFactory.create(clazz);
             return new JavaCompiledScript(this, clazz, instance, executionStrategy, bindingStrategy);

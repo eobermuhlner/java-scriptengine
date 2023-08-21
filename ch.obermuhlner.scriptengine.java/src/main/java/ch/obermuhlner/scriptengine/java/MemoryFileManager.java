@@ -46,7 +46,7 @@ public class MemoryFileManager extends ForwardingJavaFileManager<JavaFileManager
         return mapNameToClasses.values();
     }
 
-    public JavaFileObject createSourceFileObject(Object origin, String name, String code) {
+    public static JavaFileObject createSourceFileObject(Object origin, String name, String code) {
         return new MemoryJavaFileObject(origin, name, JavaFileObject.Kind.SOURCE, code);
     }
 

@@ -438,6 +438,23 @@ try {
 }
 ```
 
+### Set `CompilationStrategy` in `JavaScriptEngine`
+
+You can specify the strategy to choose which files to compile alongside your script.
+
+```java
+public interface CompilationStrategy {
+
+    List<JavaFileObject> getJavaFileObjectsToCompile(String simpleClassName, String currentSource);
+
+}
+```
+
+The default implementation `DefaultCompilationStrategy` compiles only the current script.
+
+An `IncrementalCompilationStrategy` is available and keeps the previous source files used in the same `JavaScriptEngine`.
+
+
 ### Set `Isolation` in `JavaScriptEngine`
 
 You can specfy the `Isolation` level of the script.
