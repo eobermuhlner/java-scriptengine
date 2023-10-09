@@ -254,7 +254,7 @@ public class ScriptEngineExample {
             ScriptEngineManager manager = new ScriptEngineManager();
             ScriptEngine engine = manager.getEngineByName("java");
             JavaScriptEngine javaScriptEngine = (JavaScriptEngine) engine;
-            javaScriptEngine.setCompilationSrategy(new IncrementalCompilationStrategy());
+            javaScriptEngine.setCompilationStrategy(new IncrementalCompilationStrategy());
             Compilable compiler = (Compilable) engine;
 
             CompiledScript compiledLibrary = compiler.compile("" +
